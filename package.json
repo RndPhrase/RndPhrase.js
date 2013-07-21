@@ -1,0 +1,50 @@
+{
+  "name": "RndPhrase.js",
+  "description": "This small module will replace your everyday passwords with secure per domain passwords.",
+  "author": "Johan Brinch <brinchj@gmail.com>",
+  "maintainers": [
+    {
+        "name": "Johan Brinch",
+        "email": "brinchj@gmail.com",
+        "web": "http://www.diku.dk/hjemmesider/studerende/zerrez/"
+    }
+  ],
+  "contributors": [
+    {
+        "name": "Mikkel Kjær Jensen",
+        "email": "kjmikkel@gmail.com"
+    },
+    {
+        "name": "Ronni Lindsgaard",
+        "email": "brinchj@gmail.com",
+        "web": "http://rlindsgaard.blogspot.com/"
+    },
+    {
+        "name": "Peter Müller",
+        "email": "munter@fumle.dk",
+        "web": "http://fumle.dk"
+    }
+  ],
+  "version": "0.1.0",
+  "license": "MIT",
+  "keywords": [
+    "crypto",
+    "password",
+    "domain",
+    "hash"
+  ],
+  "main": "rndphrase.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Munter/RndPhrase.js.git"
+  },
+  "dependencies": {
+    "cubehash.js": "=1.0.0"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  }
+}

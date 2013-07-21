@@ -1,0 +1,14 @@
+{
+  "name": "RndPhrase.js",
+  "version": "0.1.0",
+  "main": "rndphrase.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "test"
+  ],
+  "dependencies": {
+    "cubehash": "1.0.0"
+  }
+}
