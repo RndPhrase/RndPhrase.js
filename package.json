@@ -39,7 +39,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Munter/RndPhrase.js.git"
+    "url": "git://github.com/RndPhrase/RndPhrase.js.git"
   },
   "dependencies": {
     "cubehash.js": "=1.0.0"
