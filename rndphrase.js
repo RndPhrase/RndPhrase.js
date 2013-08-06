@@ -1,18 +1,21 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['./components/cubehash'], factory);
+        define(['cubehash'], factory);
     } else if (typeof exports === 'object') {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like enviroments that support module.exports,
         // like Node.
-        module.exports = factory(require('cubehash'));
+        module.exports = factory(require('cubehash.js'));
     } else {
         // Browser globals (root is window)
         root.returnExports = factory(root.cubehash);
     }
 }(this, function (hash) {
-    var alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    var alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789',
+        domains = {
+            get_host: function (str) { return str; }
+        };
 
     function addEvent(e, el, fn) {
         if (el.addEventListener) {
@@ -111,17 +114,19 @@
             throw new Error('RnPhrase: Missing seed in configuration');
         }
 
-        if (!config.host && typeof location !== 'undefined') {
+        if (!config.domain && typeof location !== 'undefined') {
             // Running in browser. Auto detect hostname
-            config.host = location.hostname;
-        } else {
+            config.domain = location.hostname;
+        }
+
+        if (!config.domain) {
             throw new Error('RndPhrase: Missing hostname in configuration');
         }
 
-        host = domains.get_host(config.host);
+        host = domains.get_host(config.domain);
 
         if (!host) {
-            throw new Error('RndPhase: ' + config.host + ' is not a valid hostname');
+            throw new Error('RndPhase: ' + config.domain + ' is not a valid hostname');
         }
 
         self.generator = function (passwd) {
