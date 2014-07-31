@@ -13,7 +13,7 @@ describe('RndPhrase', function () {
         assert.equal(new RndPhrase({
             seed: 'foo',
             domain: 'example.net'
-        }).generator('bar'), 'e9hn8rxt33h8pwon');
+        }).generator('bar'), '3vyr0z87hs928a7l');
         done();
     });
 });
