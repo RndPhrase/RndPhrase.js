@@ -111,7 +111,7 @@
         if (config.seed) {
             seed = hash(config.seed);
         } else {
-            throw new Error('RnPhrase: Missing seed in configuration');
+            throw new Error('RndPhrase: Missing seed in configuration');
         }
 
         if (!config.domain && typeof location !== 'undefined') {
