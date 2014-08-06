@@ -25,11 +25,12 @@ describe('RndPhrase', function () {
         var r = new RndPhrase({
             seed: 'foo',
             domain: 'example.net',
+            password: 'bar',
             version: 3
         });
-        var p = r.generator(r.generator(r.generator('bar')));
+        var g = r.generator('bar'); g(); g();
 
-        assert.equal(r.generate('bar'), p);
+        assert.equal(r.generate('bar'), g());
         done();
     });
 });
