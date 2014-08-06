@@ -16,4 +16,16 @@ describe('RndPhrase', function () {
         }).generator('bar'), '3vyr0z87hs928a7l');
         done();
     });
+
+    it('Should give correct version', function (done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            domain: 'example.net',
+            version: 3
+        });
+        var p = r.generator(r.generator(r.generator('bar')));
+
+        assert.equal(r.generate('bar'), p);
+        done();
+    });
 });

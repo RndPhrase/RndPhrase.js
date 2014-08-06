@@ -129,6 +129,10 @@
             throw new Error('RndPhase: ' + config.domain + ' is not a valid hostname');
         }
 
+        version = config.version
+
+        if(!version || version < 0) version = 1; 
+
         self.generator = function (passwd) {
             // produce secure hash from seed, password and host
             return pack(hash(hash(hash(passwd + '$' + host) + seed) + passwd));
@@ -149,7 +153,11 @@
         },
 
         generate: function (passwd) {
-            return this.generator(passwd);
+            var hash = passwd;
+            for(var i = 0; i < version; i++) {
+                hash = this.generator(hash);
+            }
+            return hash;
         }
     };
 
