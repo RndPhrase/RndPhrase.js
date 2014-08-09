@@ -135,8 +135,27 @@
 
         self.generator = function (passwd) {
             // produce secure hash from seed, password and host
-            return pack(hash(hash(hash(passwd + '$' + host) + seed) + passwd));
+            return function() {
+                passwd = pack(hash(hash(hash(passwd + '$' + host) + seed) + passwd));
+                return passwd;
+            }
         };
+
+        passwd = config.password;
+
+        if(!passwd) {
+            throw new Error('RndPhrase: Missing password in configuration');
+        }
+
+        _g = self.generator(passwd);
+
+        self.generate = function() {
+            var hash = passwd;
+            for(var i = 0; i < version; i++) {
+                hash = _g(hash);
+            }
+            return hash;
+        }
 
         doc = config.document || typeof document === 'object' && document;
 
@@ -150,14 +169,6 @@
         // This will be overwritten by constructor
         generator: function () {
             throw new Error('RndPhrase: No generator installed');
-        },
-
-        generate: function (passwd) {
-            var hash = passwd;
-            for(var i = 0; i < version; i++) {
-                hash = this.generator(hash);
-            }
-            return hash;
         }
     };
 

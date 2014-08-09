@@ -10,10 +10,14 @@ describe('RndPhrase', function () {
     });
 
     it('Should hash correctly', function (done) {
-        assert.equal(new RndPhrase({
+        var r = new RndPhrase({
             seed: 'foo',
-            domain: 'example.net'
-        }).generator('bar'), '3vyr0z87hs928a7l');
+            domain: 'example.net',
+            password: 'bar'
+        });
+
+        assert.equal(r.generate(), '3vyr0z87hs928a7l');
+        assert.equal(r.generate(), 'b1gbnl87ik9pxor6');
         done();
     });
 
@@ -21,11 +25,12 @@ describe('RndPhrase', function () {
         var r = new RndPhrase({
             seed: 'foo',
             domain: 'example.net',
+            password: 'bar',
             version: 3
         });
-        var p = r.generator(r.generator(r.generator('bar')));
+        var g = r.generator('bar'); g(); g();
 
-        assert.equal(r.generate('bar'), p);
+        assert.equal(r.generate('bar'), g());
         done();
     });
 });
