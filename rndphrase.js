@@ -230,7 +230,7 @@
         self.generator = function (passwd) {
             // produce secure hash from seed, password and host
             return function() {
-                passwd = self.pack(hash(hash(hash(passwd + '$' + host) + seed) + passwd));
+                passwd = self.pack(hash(hash(hash(hash(passwd + '$' + host) + seed) + passwd) + version));
                 return passwd;
             }
         };
@@ -244,11 +244,7 @@
         _g = self.generator(passwd);
 
         self.generate = function() {
-            var hash = passwd;
-            for(var i = 0; i < version; i++) {
-                hash = _g(hash);
-            }
-            return hash;
+            return _g();
         }
 
         doc = config.document || typeof document === 'object' && document;
