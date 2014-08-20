@@ -16,21 +16,26 @@ describe('RndPhrase', function () {
             password: 'bar'
         });
 
-        assert.equal(r.generate(), '3vyr0z87hs928a7l');
-        assert.equal(r.generate(), 'b1gbnl87ik9pxor6');
+        assert.equal(r.generate(), 'PbzJ63,,AH4hfXS%');
+        assert.equal(r.generate(), '8X.1hM%+e92&7Kej');
         done();
     });
 
-    it('Should give correct version', function (done) {
+    it('Should be different versions', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
             domain: 'example.net',
             password: 'bar',
-            version: 3
+            version: 1
         });
-        var g = r.generator('bar'); g(); g();
+        var r2 = new RndPhrase({
+            seed: 'foo',
+            domain: 'example.net',
+            password: 'bar',
+            version: 2
+        });
 
-        assert.equal(r.generate('bar'), g());
+        assert.notEqual(r.generate(), r2.generate());
         done();
     });
 });
