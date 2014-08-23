@@ -144,6 +144,12 @@
             throw new Error('RndPhase: ' + config.domain + ' is not a valid hostname');
         }
 
+        passwd = config.password;
+
+        if(!passwd) {
+            throw new Error('RndPhrase: Missing password in configuration');
+        }
+
         version = config.version
 
         if(!version || version < 0) {
@@ -236,12 +242,6 @@
                 return passwd;
             }
         };
-
-        passwd = config.password;
-
-        if(!passwd) {
-            throw new Error('RndPhrase: Missing password in configuration');
-        }
 
         state = self.generator(passwd);
 
