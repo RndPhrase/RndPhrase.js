@@ -18,6 +18,15 @@ describe('RndPhrase', function () {
         done();
     });
 
+    it('Should have private state', function() {
+        var r = new RndPhrase({
+            seed: 'foo',
+            domain: 'example.net',
+            password: 'bar'
+        });
+        assert.equal(r.state, undefined);
+    });
+
     it('Should hash correctly', function (done) {
         var r = new RndPhrase({
             seed: 'foo',

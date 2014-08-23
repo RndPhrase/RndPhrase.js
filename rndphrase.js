@@ -113,6 +113,8 @@
         return s;
     }
 
+    var state;
+
     function RndPhrase(config) {
         var self = this,
             host,
@@ -241,10 +243,10 @@
             throw new Error('RndPhrase: Missing password in configuration');
         }
 
-        _g = self.generator(passwd);
+        state = self.generator(passwd);
 
         self.generate = function() {
-            return _g();
+            return state();
         }
 
         doc = config.document || typeof document === 'object' && document;
