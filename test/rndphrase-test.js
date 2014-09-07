@@ -21,7 +21,7 @@ describe('RndPhrase', function () {
     it('Should have private state', function() {
         var r = new RndPhrase({
             seed: 'foo',
-            domain: 'example.net',
+            uri: 'example.net',
             password: 'bar'
         });
         assert.equal(r.state, undefined);
@@ -30,7 +30,7 @@ describe('RndPhrase', function () {
     it('Should hash correctly', function (done) {
         var r = new RndPhrase({
             seed: 'foo',
-            domain: 'example.net',
+            uri: 'example.net',
             password: 'bar'
         });
 
@@ -42,7 +42,7 @@ describe('RndPhrase', function () {
     it('Should hash differently', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
-            domain: 'example.net'
+            uri: 'example.net'
         });
 
         assert.notEqual(r.generate('baz'), 'PbzJ63,,AH4hfXS%');
@@ -55,13 +55,13 @@ describe('RndPhrase', function () {
     it('Should be different versions', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
-            domain: 'example.net',
+            uri: 'example.net',
             password: 'bar',
             version: 1
         });
         var r2 = new RndPhrase({
             seed: 'foo',
-            domain: 'example.net',
+            uri: 'example.net',
             password: 'bar',
             version: 2
         });
@@ -73,7 +73,7 @@ describe('RndPhrase', function () {
     it('Should contain 4 As', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
-            domain: 'example.net',
+            uri: 'example.net',
             password: 'bar',
             capital: {
                 min: 4,
@@ -89,7 +89,7 @@ describe('RndPhrase', function () {
     it('Should contain 4 as', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
-            domain: 'example.net',
+            uri: 'example.net',
             password: 'bar',
             minuscule: {
                 min: 4,
@@ -105,7 +105,7 @@ describe('RndPhrase', function () {
     it('Should contain 4 1s', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
-            domain: 'example.net',
+            uri: 'example.net',
             password: 'bar',
             numeric: {
                 min: 4,
@@ -122,7 +122,7 @@ describe('RndPhrase', function () {
     it('Should contain 4 -s', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
-            domain: 'example.net',
+            uri: 'example.net',
             password: 'bar',
             special: {
                 min: 4,

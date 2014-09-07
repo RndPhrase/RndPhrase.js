@@ -12,81 +12,6 @@
         root.returnExports = factory(root.cubehash);
     }
 }(this, function (hash) {
-    var alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789',
-        domains = {
-            get_host: function (str) { return str; }
-        };
-
-    function addEvent(e, el, fn) {
-        if (el.addEventListener) {
-            // W3C DOM
-            el.addEventListener(e, fn, false);
-        } else if (el.attachEvent) {
-            // IE DOM
-            el.attachEvent('on' + e, fn);
-        } else { // No much to do
-            el['on' + e] = fn;
-        }
-    }
-
-    function clearInput(input) {
-        input.style.backgroundColor = '';
-        input._rndphrase = '';
-    }
-
-    function updateInput(self, input) {
-        if (input._rndphrase === 'active' && input.value) {
-            input.value = self.generator(input.value);
-            clearInput(input);
-        }
-    }
-
-    // keypress :: State -> DOMEvent -> ()
-    function keypress(self) {
-        return function (e) {
-            var input = e && e.target || window.event.srcElement;
-
-            if (input.type === undefined) {
-                return;
-            }
-
-            if (input.type.toLowerCase() === 'password' && input.value === '' && String.fromCharCode(e.which) === '@') {
-                // don't add the @ to the value
-                e.stopPropagation();
-                e.preventDefault();
-
-                // new rndphrase password field
-                input._rndphrase = 'active';
-                input.style.backgroundColor = '#CCCCFF';
-
-                addEvent('blur', input, function () {
-                    updateInput(self, input);
-                });
-            }
-        };
-    }
-
-    // keydown :: State -> DOMEvent -> ()
-    function keydown(self) {
-        return function (e) {
-            var input = e && e.target || window.event.srcElement;
-
-            if (input && input._rndphrase === 'active') {
-                switch (e.which) {
-                case  9: // Tab
-                case 13: // Enter
-                    updateInput(self, input);
-                    break;
-                case  8: // Backspace
-                case 27: // Escape
-                case 46: // Delete
-                    clearInput(input);
-                    break;
-                default:
-                }
-            }
-        };
-    }
 
     function is_alpha(c) {
         var cc = c.charCodeAt(0);
@@ -129,19 +54,14 @@
             throw new Error('RndPhrase: Missing seed in configuration');
         }
 
-        if (!config.domain && typeof location !== 'undefined') {
-            // Running in browser. Auto detect hostname
-            config.domain = location.hostname;
-        }
-
-        if (!config.domain) {
+        if (!config.uri) {
             throw new Error('RndPhrase: Missing hostname in configuration');
         }
 
-        host = domains.get_host(config.domain);
+        uri = config.uri;
 
-        if (!host) {
-            throw new Error('RndPhase: ' + config.domain + ' is not a valid hostname');
+        if (!uri) {
+            throw new Error('RndPhase: ' + config.uri + ' is not a valid hostname');
         }
 
         passwd = config.password;
@@ -234,7 +154,7 @@
         self.generator = function (passwd) {
             // produce secure hash from seed, password and host
             return function() {
-                passwd = self.pack(hash(hash(hash(hash(passwd + '$' + host) + seed) + passwd) + version));
+                passwd = self.pack(hash(hash(hash(hash(passwd + '$' + uri) + seed) + passwd) + version));
                 return passwd;
             }
         };
@@ -246,12 +166,6 @@
             return state();
         }
 
-        doc = config.document || typeof document === 'object' && document;
-
-        if (doc) {
-            addEvent('keypress', doc, keypress(self), true);
-            addEvent('keydown', doc, keydown(self), true);
-        }
     }
 
     RndPhrase.prototype = {
