@@ -39,6 +39,19 @@ describe('RndPhrase', function () {
         done();
     });
 
+    it('Should hash differently', function(done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            domain: 'example.net'
+        });
+
+        assert.notEqual(r.generate('baz'), 'PbzJ63,,AH4hfXS%');
+        assert.notEqual(r.generate(), '8X.1hM%+e92&7Kej');
+        assert.equal(r.generate('bar'), 'PbzJ63,,AH4hfXS%');
+        assert.equal(r.generate(), '8X.1hM%+e92&7Kej');
+        done();
+    });
+
     it('Should be different versions', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
@@ -123,4 +136,5 @@ describe('RndPhrase', function () {
         assert.equal(4, count('-', hash));
         done();
     });
+
 });

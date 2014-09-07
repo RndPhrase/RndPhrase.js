@@ -146,10 +146,6 @@
 
         passwd = config.password;
 
-        if(!passwd) {
-            throw new Error('RndPhrase: Missing password in configuration');
-        }
-
         version = config.version
 
         if(!version || version < 0) {
@@ -245,7 +241,8 @@
 
         state = self.generator(passwd);
 
-        self.generate = function() {
+        self.generate = function(password) {
+            if(password) state = self.generator(password)
             return state();
         }
 
