@@ -109,8 +109,6 @@
         }
 
         self.pack = function(unpacked) {
-            //unpacked should be of the size
-            //sources*2*size
             var sources = [];
             if(capital) sources.push(capital);
             if(minuscule) sources.push(minuscule);
@@ -131,14 +129,17 @@
             }
 
             var ints = str2ints(unpacked);
-            var hash = '';
+            var tmp = '';
 
-            while(!self._validate(hash, sources)) {
+            while(!self._validate(tmp, sources)) {
+                if(ints.length < 3) {
+                    ints = ints.concat(str2ints(hash(tmp)));
+                }
                 try {
                     var integer = ints.shift();
                     choice = integer % sources.length;
                     source = sources[choice];
-                    hash += source.alphabet.charAt(ints.shift() % source.alphabet.length);
+                    tmp += source.alphabet.charAt(ints.shift() % source.alphabet.length);
                     sources[choice].count++;
                     if((sources[choice].max > 0) && !(sources[choice].count < sources[choice].max)) {
                         sources.splice(choice, 1);
@@ -148,7 +149,7 @@
                     throw new Error("RndPhrase: Could not generate valid hash.");
                 }
             }
-            return hash;
+            return tmp;
         }
 
         self.generator = function (passwd) {

@@ -137,4 +137,14 @@ describe('RndPhrase', function () {
         done();
     });
 
+    it('Should be long', function(done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            size: 42
+        });
+        assert.equal(42, r.generate().length);
+        done();
+    });
 });
