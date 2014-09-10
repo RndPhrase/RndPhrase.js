@@ -14,25 +14,25 @@ This might be more obvious with an example.
 1. First you decide a seed, this is a secret that only you know. For the purpose of this example lets use the seed "nobodyknowsmyseed"
 2. Choose a password that you wish to use. We'll just use "secret".
 3. Now here comes the magic...
-Let's try to make a password for github.com
-    var r = new RndPhrase({
-        seed: 'nobodyknowsmyseed',
-        uri: 'github.com',
-        password: 'secret',
-    });
+   Let's try to make a password for github.com
+	    var r = new RndPhrase({
+	        seed: 'nobodyknowsmyseed',
+	        uri: 'github.com',
+	        password: 'secret',
+	    });
 
-  	console.log(r.generate()); //output 1,d$[xtd%S&1b8%9
+	  	console.log(r.generate()); //output 1,d$[xtd%S&1b8%9
 
   So far so good, this looks like password that is hard to guess. Even if this is stored hashed in a database, it doesn't look like a password anybody in their right mind entered.
   Now let's create one for facebook.com
 
-	var r2 = new RndPhrase({
-        seed: 'nobodyknowsmyseed',
-        uri: 'facebook.com',
-        password: 'secret',
-    });
+		var r2 = new RndPhrase({
+	        seed: 'nobodyknowsmyseed',
+	        uri: 'facebook.com',
+	        password: 'secret',
+	    });
 
-	console.log(r.generate()); //output 8a)4 ,J-Ds1^l(ua
+		console.log(r.generate()); //output 8a)4 ,J-Ds1^l(ua
 
 4. Wow! We used the same credentials, but the output was two completely different things - and all we changed was the password!
 
