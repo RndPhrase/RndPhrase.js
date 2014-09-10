@@ -15,6 +15,7 @@ This might be more obvious with an example.
 2. Choose a password that you wish to use. We'll just use "secret".
 3. Now here comes the magic...
    Let's try to make a password for github.com
+	    
 	    var r = new RndPhrase({
 	        seed: 'nobodyknowsmyseed',
 	        uri: 'github.com',
