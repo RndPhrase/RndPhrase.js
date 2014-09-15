@@ -32,7 +32,7 @@
 
     function setup_source(source, alphabet) {
         s = source || {};
-        if(!s.min) s.min = 0;
+        if(!s.min) s.min = 1;
         if(!s.max) s.max = -1;
         if(!s.alphabet) s.alphabet = alphabet;
         return s;

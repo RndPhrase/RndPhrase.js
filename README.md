@@ -97,7 +97,7 @@ Configuration for capital letters. Set to false to disable.
 Default:
 
 	{
-		min: 0,
+		min: 1,
 		max: -1, //infinite
 		alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 	}
@@ -107,7 +107,7 @@ Configuration for minuscule letters. Set to false to disable.
 Default:
 
 	{
-		min: 0,
+		min: 1,
 		max: -1, //infinite
 		alphabet: 'abcdefghijklmnopqrstuvwxyz'
 	}
@@ -117,7 +117,7 @@ Configuration for numbers. Set to false to disable.
 Default:
 
 	{
-		min: 0,
+		min: 1,
 		max: -1, //infinite
 		alphabet: '0123456789'
 	}
@@ -127,7 +127,7 @@ Configuration for special symbols. Set to false to disable.
 Default:
 
 	{
-		min: 0,
+		min: 1,
 		max: -1, //infinite
 		alphabet: " !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
 	}
