@@ -36,7 +36,7 @@ This might be more obvious with an example.
 
 		console.log(r.generate()); //output 8a'4}+J Ds1%l ua
 
-4. Wow! We used the same credentials, but the output was two completely different things - and all we changed was the password!
+4. Wow! We used the same credentials, but the output was two completely different things - and all we changed was the domain!
 
 ## How it works
 RndPhrase uses three pieces of information, a seed, a password and a uri. The seed is supposed to be stored in the browser as something that is typed in once. Remember this one if you switch systems. ;)
