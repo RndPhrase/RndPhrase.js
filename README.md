@@ -7,8 +7,8 @@ The purpose of RndPhrase is to keep your password secure by creating a hash of t
 
 This fixes some common issues that are with passwords.
 
-1. Shoulder surfing my reveal the password you type, but not the actual password
-2. Passwords are not use cross domain which means that if your account is compromised, everything else using the same password is not.
+1. Shoulder surfing might reveal the password you type, but not the actual password sent to the server.
+2. Passwords are not used cross domain which means that if your account is compromised, even though you use the same password elsewhere, these sites are not compromised.
 
 This might be more obvious with an example.
 
