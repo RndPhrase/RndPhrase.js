@@ -24,8 +24,8 @@
 
     function str2ints(str) {
         var ints = [];
-        for (i = 0; i < str.length; i += 2) {
-            ints.push(parseInt(str.substring(i, i + 2), 16));
+        for (i = 0; i < str.length; i += 4) {
+            ints.push(parseInt(str.substring(i, i + 4), 16));
         }
         return ints;
     }
