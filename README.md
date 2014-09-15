@@ -6,6 +6,7 @@ RndPhrase.js is a javascript module to autogenerate secure passwords. It is a li
 The purpose of RndPhrase is to keep your password secure by creating a hash of the password which is sent to the server instead of a plaintext one.
 
 This fixes some common issues that are with passwords.
+
 1. Shoulder surfing my reveal the password you type, but not the actual password
 2. Passwords are not use cross domain which means that if your account is compromised, everything else using the same password is not.
 
@@ -33,7 +34,7 @@ This might be more obvious with an example.
 	        password: 'secret',
 	    });
 
-		console.log(r.generate()); //output 8a)4 ,J-Ds1^l(ua
+		console.log(r.generate()); //output 8a'4}+J Ds1%l ua
 
 4. Wow! We used the same credentials, but the output was two completely different things - and all we changed was the password!
 
@@ -55,12 +56,12 @@ Instantiate the object with the minimum configuration requirements
 
 Invoke the generate method
 	
-	r.generate('secret'); // 2JaL3!9e_o&T5x9I
+	r.generate('secret'); // 2JaL3{9e*o>T5x9I
 
 Subsequent calls to the generate method yields new passwords
 
-	r.generate(); // 4t{79GOASV0K50H6
-	r.generate(); // BAb61q9382!Srh-2
+	r.generate(); // Q^RkA%kx){AI9`0!
+	r.generate(); // Rucn;5;^maAv08X|
 
 ### Configuration
 It is possible to configure RndPhrase.js to enforce restrictions on the generated passwords to adapt use for websites that have misunderstood password security. Everything is passed in a JSON object with following options
@@ -128,7 +129,7 @@ Default:
 	{
 		min: 0,
 		max: -1, //infinite
-		alphabet: '!@#$%^&*[{()}]_+-= ,.?'
+		alphabet: " !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
 	}
 
 ## Donate

@@ -94,7 +94,7 @@
 
         special = config.special;
         if(special !== false) {
-            special = setup_source(special, '!@#$%^&*[{()}]_+-= ,.?');
+            special = setup_source(special, " !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~");
         }
 
         self._validate = function(hash, sources) {
