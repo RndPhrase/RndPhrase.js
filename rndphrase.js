@@ -22,14 +22,6 @@
         return (47 < c.charCodeAt(0) < 58);
     }
 
-    function str2ints(str) {
-        var ints = [];
-        for (i = 0; i < str.length; i += 4) {
-            ints.push(parseInt(str.substring(i, i + 4), 16));
-        }
-        return ints;
-    }
-
     function setup_source(source, alphabet) {
         s = source || {};
         if(!s.min) s.min = 1;
@@ -128,18 +120,43 @@
                 }
             }
 
-            var ints = str2ints(unpacked);
+            function getInt(size) {
+                if(unpacked.length < size) {
+                    unpacked += hash(tmp)
+                }
+
+                n = parseInt(unpacked.substring(0,size), 16);
+                unpacked = unpacked.substring(size);
+                return n;
+            }
+
             var tmp = '';
 
             while(!self._validate(tmp, sources)) {
-                if(ints.length < 3) {
-                    ints = ints.concat(str2ints(hash(tmp)));
-                }
                 try {
-                    var integer = ints.shift();
+                    var integer;
+                    if(16 % sources.length) {
+                        do {
+                            integer = getInt(1);
+                        } while(integer > (15 - (14 % sources.length)))
+                    } else {
+                        integer = getInt(1);
+                    }
+                    
                     choice = integer % sources.length;
                     source = sources[choice];
-                    tmp += source.alphabet.charAt(ints.shift() % source.alphabet.length);
+
+                    var c;
+
+                    if(256 % source.alphabet.length) {
+                        do {
+                            c = getInt(2);
+                        } while(c > (255 - (254 % source.alphabet.length)))
+                    } else {
+                        c = getInt(2);
+                    }
+
+                    tmp += source.alphabet.charAt(c % source.alphabet.length);
                     sources[choice].count++;
                     if((sources[choice].max > 0) && !(sources[choice].count < sources[choice].max)) {
                         sources.splice(choice, 1);
