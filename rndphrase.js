@@ -138,7 +138,7 @@
                     if(16 % sources.length) {
                         do {
                             integer = getInt(1);
-                        } while(integer > (15 - (14 % sources.length)))
+                        } while(integer > (14 - (15 % sources.length)))
                     } else {
                         integer = getInt(1);
                     }
@@ -151,7 +151,7 @@
                     if(256 % source.alphabet.length) {
                         do {
                             c = getInt(2);
-                        } while(c > (255 - (254 % source.alphabet.length)))
+                        } while(c > (254 - (255 % source.alphabet.length)))
                     } else {
                         c = getInt(2);
                     }
