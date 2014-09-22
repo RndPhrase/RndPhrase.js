@@ -34,8 +34,8 @@ describe('RndPhrase', function () {
             password: 'bar'
         });
 
-        assert.equal(r.generate(), ' -?zKic31pHAGs/h');
-        assert.equal(r.generate(), '^<8Oh9yN&1+T>_i7');
+        assert.equal(r.generate(), '_\'<zKic31pHAGs)h');
+        assert.equal(r.generate(), 'bB8 LG04894O]iI>');
         done();
     });
 
@@ -45,10 +45,10 @@ describe('RndPhrase', function () {
             uri: 'example.net'
         });
 
-        assert.notEqual(r.generate('baz'), ' -?zKic31pHAGs/h');
-        assert.notEqual(r.generate(), '^<8Oh9yN&1+T>_i7');
-        assert.equal(r.generate('bar'), ' -?zKic31pHAGs/h');
-        assert.equal(r.generate(), '^<8Oh9yN&1+T>_i7');
+        assert.notEqual(r.generate('baz'), '_\'<zKic31pHAGs)h');
+        assert.notEqual(r.generate(), 'bB8 LG04894O]iI>');
+        assert.equal(r.generate('bar'), '_\'<zKic31pHAGs)h');
+        assert.equal(r.generate(), 'bB8 LG04894O]iI>');
         done();
     });
 
