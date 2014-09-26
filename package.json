@@ -25,7 +25,7 @@
         "web": "http://fumle.dk"
     }
   ],
-  "version": "0.1.0",
+  "version": "0.9.0",
   "license": "MIT",
   "keywords": [
     "crypto",
