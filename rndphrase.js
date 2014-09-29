@@ -24,8 +24,10 @@
 
     function setup_source(source, alphabet) {
         s = source || {};
-        if(!s.min) s.min = 1;
-        if(!s.max) s.max = -1;
+        var min = parseInt(s.min);
+        if(isNaN(min)) s.min = 1;
+        var max = parseInt(s.max);
+        if(isNaN(s.max)) s.max = -1;
         if(!s.alphabet) s.alphabet = alphabet;
         return s;
     }
@@ -58,14 +60,14 @@
 
         passwd = config.password;
 
-        version = config.version
+        version = parseInt(config.version);
 
-        if(!version || version < 0) {
+        if(isNaN(version) || version < 0) {
             version = 1;
         }
 
-        size = config.size;
-        if(size == undefined) {
+        size = parseInt(config.size);
+        if(isNaN(size)) {
             size = 16;
         }
 
