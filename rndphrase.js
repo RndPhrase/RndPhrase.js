@@ -115,7 +115,11 @@
 
             //if max for each source is zero, we remove it
             for(var i = 0; i < sources.length; i++) {
-                sources[i].count = 0;
+                if(!sources[i].min && !sources[i].max){
+                    sources.splice(i,1);
+                } else {
+                    sources[i].count = 0;
+                }
             }
 
             function getInt(size) {
