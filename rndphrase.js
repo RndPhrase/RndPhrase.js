@@ -27,7 +27,7 @@
         var min = parseInt(s.min);
         if(isNaN(min)) s.min = 1;
         var max = parseInt(s.max);
-        if(isNaN(s.max)) s.max = -1;
+        if(isNaN(s.max)) s.max = 0;
         if(!s.alphabet) s.alphabet = alphabet;
         return s;
     }
@@ -115,11 +115,7 @@
 
             //if max for each source is zero, we remove it
             for(var i = 0; i < sources.length; i++) {
-                if(sources[i].max == 0) {
-                    sources.splice(i,1);
-                } else {
-                    sources[i].count = 0;
-                }
+                sources[i].count = 0;
             }
 
             function getInt(size) {
@@ -160,7 +156,7 @@
 
                     tmp += source.alphabet.charAt(c % source.alphabet.length);
                     sources[choice].count++;
-                    if((sources[choice].max > 0) && !(sources[choice].count < sources[choice].max)) {
+                    if(source.max >= source.min && sources[choice].count >= source.max) {
                         sources.splice(choice, 1);
                     }
                 } catch(e) {
