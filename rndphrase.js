@@ -102,8 +102,6 @@
             special = setup_source(special, " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
         }
 
-        
-
         self.pack = function(unpacked) {
             var sources = [];
             if(capital) sources.push(capital);
@@ -194,7 +192,6 @@
             if(password) state = self.generator(password)
             return state();
         }
-
     }
 
     RndPhrase.prototype = {
