@@ -32,6 +32,17 @@
         return s;
     }
 
+    function validate(hash, sources, size) {
+            for(var s in sources) {
+                if(sources[s].min > 0) {
+                    if(sources[s].count < sources[s].min) {
+                        return false;
+                    }
+                }
+            }
+            return hash.length >= size;
+    }
+
     var state;
 
     function RndPhrase(config) {
@@ -91,16 +102,7 @@
             special = setup_source(special, " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
         }
 
-        self._validate = function(hash, sources) {
-            for(var s in sources) {
-                if(sources[s].min > 0) {
-                    if(sources[s].count < sources[s].min) {
-                        return false;
-                    }
-                }
-            }
-            return hash.length >= size;
-        }
+        
 
         self.pack = function(unpacked) {
             var sources = [];
@@ -108,6 +110,8 @@
             if(minuscule) sources.push(minuscule);
             if(numeric) sources.push(numeric);
             if(special) sources.push(special);
+
+            var n = 0;
 
             if(!sources.length) {
                 throw new Error("RndPhrase: Could not generate valid hash.")
@@ -118,9 +122,14 @@
                 if(!sources[i].min && !sources[i].max){
                     sources.splice(i,1);
                 } else {
+                    if(sources[i].max >= sources[i].min) {
+                        n += sources[i].max;
+                    }
                     sources[i].count = 0;
                 }
             }
+
+            var min_size = Math.min(size, n) || size;
 
             function getInt(size) {
                 if(unpacked.length < size) {
@@ -134,7 +143,7 @@
 
             var tmp = '';
 
-            while(!self._validate(tmp, sources)) {
+            while(!validate(tmp, sources, min_size)) {
                 try {
                     var integer;
                     if(16 % sources.length) {
