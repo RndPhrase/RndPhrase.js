@@ -147,4 +147,131 @@ describe('RndPhrase', function () {
         assert.equal(42, r.generate().length);
         done();
     });
+
+    it('Should be 8 digits long', function(done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            numeric: { max: 2 },
+            capital: { max: 2 },
+            minuscule: { max: 2 },
+            special: { max: 2 },
+            size: 10
+        });
+        assert.equal(8, r.generate().length);
+        done();
+    });
+
+    it('Should be minimum 10 digits long', function(done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            numeric: { max: 0 },
+            capital: { max: 2 },
+            minuscule: { max: 2 },
+            special: { max: 2 },
+            size: 10
+        });
+        
+        assert(10 <= r.generate().length);
+
+
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            numeric: { max: 2 },
+            capital: { max: 0 },
+            minuscule: { max: 2 },
+            special: { max: 2 },
+            size: 10
+        });
+        assert(10 <= r.generate().length);
+
+
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            numeric: { max: 2 },
+            capital: { max: 2 },
+            minuscule: { max: 0 },
+            special: { max: 2 },
+            size: 10
+        });
+        assert(10 <= r.generate().length);
+
+
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            numeric: { max: 2 },
+            capital: { max: 2 },
+            minuscule: { max: 2 },
+            special: { max: 0 },
+            size: 10
+        });
+        assert(10 <= r.generate().length);
+
+        done();
+    });
+
+    it('Should ignore max value', function(done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            numeric: { min: 2, max: 1},
+            capital: { max: 2 },
+            minuscule: { max: 2 },
+            special: { max: 2 },
+            size: 16
+        });
+        
+        assert.equal(16, r.generate().length);
+
+
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            numeric: { max: 2 },
+            capital: { min: 2, max: 1 },
+            minuscule: { max: 2 },
+            special: { max: 2 },
+            size: 16
+        });
+        assert(16, r.generate().length);
+
+
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            numeric: { max: 2 },
+            capital: { max: 2 },
+            minuscule: { min: 2, max: 1 },
+            special: { max: 2 },
+            size: 16
+        });
+        assert(16, r.generate().length);
+
+
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            numeric: { max: 2 },
+            capital: { max: 2 },
+            minuscule: { max: 2 },
+            special: { min: 2, max: 1 },
+            size: 16
+        });
+        assert.equal(16, r.generate().length);
+
+        done();
+    });
 });

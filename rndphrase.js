@@ -120,12 +120,12 @@
                 if(!sources[i].min && !sources[i].max){
                     sources.splice(i,1);
                 } else {
-                    if(sources[i].max >= sources[i].min && min_size < size) {
+                    if(sources[i].max >= sources[i].min) {
                         min_size += sources[i].max;
                     } else {
-                        min_size = size;
-                        sources[i].count = 0;
+                        min_size += size;
                     }
+                    sources[i].count = 0;
                 }
             }
 
@@ -141,7 +141,7 @@
 
             var tmp = '';
 
-            while(!validate(tmp, sources, min_size)) {
+            while(!validate(tmp, sources, Math.min(min_size, size))) {
                 try {
                     var integer;
                     if(16 % sources.length) {
