@@ -109,8 +109,8 @@
             if(numeric) sources.push(numeric);
             if(special) sources.push(special);
 
-            var n = 0;
-
+            var min_size = 0;
+            
             if(!sources.length) {
                 throw new Error("RndPhrase: Could not generate valid hash.")
             }
@@ -120,14 +120,14 @@
                 if(!sources[i].min && !sources[i].max){
                     sources.splice(i,1);
                 } else {
-                    if(sources[i].max >= sources[i].min) {
-                        n += sources[i].max;
+                    if(sources[i].max >= sources[i].min && min_size < size) {
+                        min_size += sources[i].max;
+                    } else {
+                        min_size = size;
+                        sources[i].count = 0;
                     }
-                    sources[i].count = 0;
                 }
             }
-
-            var min_size = Math.min(size, n) || size;
 
             function getInt(size) {
                 if(unpacked.length < size) {
