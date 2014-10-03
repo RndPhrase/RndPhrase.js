@@ -53,11 +53,7 @@
 
         config = config || {};
 
-        if (config.seed) {
-            seed = hash(config.seed);
-        } else {
-            throw new Error('RndPhrase: Missing seed in configuration');
-        }
+        seed = hash(config.seed || '');
 
         if (!config.uri) {
             throw new Error('RndPhrase: Missing hostname in configuration');
@@ -69,7 +65,7 @@
             throw new Error('RndPhase: ' + config.uri + ' is not a valid hostname');
         }
 
-        passwd = config.password;
+        passwd = config.password || '';
 
         version = parseInt(config.version);
 
