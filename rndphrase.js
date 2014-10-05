@@ -127,7 +127,8 @@
 
             function getInt(size) {
                 if(unpacked.length < size) {
-                    unpacked += hash(tmp)
+                    //maybe we can also use the alphabets or something for adding more entropy
+                    unpacked += hash(hash(hash(tmp) + unpacked) + size);
                 }
 
                 n = parseInt(unpacked.substring(0,size), 16);
