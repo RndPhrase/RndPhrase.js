@@ -52,10 +52,6 @@
 
         uri = config.uri;
 
-        if (!uri) {
-            throw new Error('RndPhase: ' + config.uri + ' is not a valid hostname');
-        }
-
         passwd = config.password || '';
 
         version = parseInt(config.version);
