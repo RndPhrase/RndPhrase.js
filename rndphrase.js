@@ -13,16 +13,7 @@
     }
 }(this, function (hash) {
 
-    function is_alpha(c) {
-        var cc = c.charCodeAt(0);
-        return ((cc > 64 && 91 > cc) || (cc > 96 && 123 > cc));
-    }
-
-    function is_num(c) {
-        return (47 < c.charCodeAt(0) < 58);
-    }
-
-    function setup_source(source, alphabet) {
+   function setup_source(source, alphabet) {
         s = source || {};
         var min = parseInt(s.min);
         if(isNaN(min)) s.min = 1;
