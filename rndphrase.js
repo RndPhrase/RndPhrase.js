@@ -94,7 +94,7 @@
             var divisor = 0;
 
             if(!sources.length) {
-                throw new Error("RndPhrase: Could not generate valid hash.")
+                throw new Error("RndPhrase: Could not generate valid hash.");
             }
 
             //if max for each source is zero, we remove it
@@ -131,7 +131,7 @@
             //we calculate it here for consistency
             var n = 0;
             while(Math.pow(16, n) < divisor) n++;
-            m = Math.pow(16, n);
+            var m = Math.pow(16, n);
 
             while(!validate(tmp, sources, Math.min(min_size, self.size))) {
                 try {
@@ -165,22 +165,22 @@
                 }
             }
             return tmp;
-        }
+        };
 
         self.generator = function (passwd) {
             // produce secure hash from seed, password and host
             return function() {
                 self.passwd = self.pack(hash(hash(hash(hash(self.passwd + '$' + self.uri) + self.seed) + self.passwd) + self.version));
                 return self.passwd;
-            }
-        }
+            };
+        };
 
         self.state = self.generator(self.passwd);
 
         self.generate = function(password) {
             if(password) self.state = self.generator(password);
             return self.state();
-        }
+        };
     }
 
     RndPhrase.prototype = {
@@ -188,7 +188,7 @@
         generator: function () {
             throw new Error('RndPhrase: No generator installed');
         }
-    }
+    };
 
     return RndPhrase;
 }));
