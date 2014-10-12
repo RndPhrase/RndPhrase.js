@@ -34,8 +34,6 @@
             return hash.length >= size;
     }
 
-    var state;
-
     function RndPhrase(config) {
         var self = this,
             host,
@@ -44,53 +42,53 @@
 
         config = config || {};
 
-        seed = hash(config.seed || '');
+        self.seed = hash(config.seed || '');
 
         if (!config.uri) {
             throw new Error('RndPhrase: Missing hostname in configuration');
         }
 
-        uri = config.uri;
+        self.uri = config.uri;
 
-        passwd = config.password || '';
+        self.passwd = config.password || '';
 
-        version = parseInt(config.version);
+        self.version = parseInt(config.version);
 
-        if(isNaN(version) || version < 0) {
-            version = 1;
+        if(isNaN(self.version) || self.version < 0) {
+            self.version = 1;
         }
 
-        size = parseInt(config.size);
-        if(isNaN(size)) {
-            size = 16;
+        self.size = parseInt(config.size);
+        if(isNaN(self.size)) {
+            self.size = 16;
         }
 
-        capital = config.capital;
-        if(capital !== false) {
-            capital = setup_source(capital, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        self.capital = config.capital;
+        if(self.capital !== false) {
+            self.capital = setup_source(self.capital, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
         }
 
-        minuscule = config.minuscule;
-        if(minuscule !== false) {
-            minuscule = setup_source(minuscule, 'abcdefghijklmnopqrstuvwxyz');
+        self.minuscule = config.minuscule;
+        if(self.minuscule !== false) {
+            self.minuscule = setup_source(self.minuscule, 'abcdefghijklmnopqrstuvwxyz');
         }
 
-        numeric = config.numeric;
-        if(numeric !== false) {
-            numeric = setup_source(numeric, '0123456789');
+        self.numeric = config.numeric;
+        if(self.numeric !== false) {
+            self.numeric = setup_source(self.numeric, '0123456789');
         }
 
-        special = config.special;
-        if(special !== false) {
-            special = setup_source(special, " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
+        self.special = config.special;
+        if(self.special !== false) {
+            self.special = setup_source(self.special, " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
         }
 
         self.pack = function(unpacked) {
             var sources = [];
-            if(capital) sources.push(capital);
-            if(minuscule) sources.push(minuscule);
-            if(numeric) sources.push(numeric);
-            if(special) sources.push(special);
+            if(self.capital) sources.push(self.capital);
+            if(self.minuscule) sources.push(self.minuscule);
+            if(self.numeric) sources.push(self.numeric);
+            if(self.special) sources.push(self.special);
 
             var min_size = 0;
             var divisor = 0;
@@ -109,7 +107,7 @@
                     if(sources[i].max >= sources[i].min) {
                         min_size += sources[i].max;
                     } else {
-                        min_size += size;
+                        min_size += self.size;
                     }
                     sources[i].count = 0;
                     divisor += sources[i].alphabet.length;
@@ -135,7 +133,7 @@
             while(Math.pow(16, n) < divisor) n++;
             m = Math.pow(16, n);
 
-            while(!validate(tmp, sources, Math.min(min_size, size))) {
+            while(!validate(tmp, sources, Math.min(min_size, self.size))) {
                 try {
                     var c;
 
@@ -172,16 +170,16 @@
         self.generator = function (passwd) {
             // produce secure hash from seed, password and host
             return function() {
-                passwd = self.pack(hash(hash(hash(hash(passwd + '$' + uri) + seed) + passwd) + version));
+                passwd = self.pack(hash(hash(hash(hash(self.passwd + '$' + self.uri) + self.seed) + self.passwd) + self.version));
                 return passwd;
             }
         };
 
-        state = self.generator(passwd);
+        self.state = self.generator(self.passwd);
 
         self.generate = function(password) {
-            if(password) state = self.generator(password)
-            return state();
+            if(password) self.state = self.generator(password)
+            return self.state();
         }
     }
 

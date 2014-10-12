@@ -18,37 +18,37 @@ describe('RndPhrase', function () {
         done();
     });
 
-    it('Should have private state', function() {
-        var r = new RndPhrase({
-            seed: 'foo',
-            uri: 'example.net',
-            password: 'bar'
-        });
-        assert.equal(r.state, undefined);
-    });
-
-    it('Should hash correctly', function (done) {
-        var r = new RndPhrase({
+    it('Should hash deterministically', function (done) {
+        var r1 = new RndPhrase({
             seed: 'foo',
             uri: 'example.net',
             password: 'bar'
         });
 
-        assert.equal(r.generate(), 'P^=/h(r\\%w[.[]Iqdh6');
-        assert.equal(r.generate(), 'wEy-d:{\'uAWKDrroH1');
+        var r2 = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar'
+        });
+
+        assert.equal(r1.generate(), r2.generate());
         done();
     });
 
     it('Should hash differently', function(done) {
-        var r = new RndPhrase({
+        var r1 = new RndPhrase({
             seed: 'foo',
             uri: 'example.net'
         });
+        
+        var r2 = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.com'
+        });
+        
+        assert.notEqual(r1.generate('baz'), r2.generate('baz'));
+        assert.notEqual(r1.generate(), r2.generate());
 
-        assert.notEqual(r.generate('baz'), 'P^=/h(r\\%w[.[]Iqdh6');
-        assert.notEqual(r.generate(), 'wEy-d:{\'uAWKDrroH1');
-        assert.equal(r.generate('bar'), 'P^=/h(r\\%w[.[]Iqdh6');
-        assert.equal(r.generate(), 'wEy-d:{\'uAWKDrroH1');
         done();
     });
 
@@ -59,6 +59,7 @@ describe('RndPhrase', function () {
             password: 'bar',
             version: 1
         });
+        
         var r2 = new RndPhrase({
             seed: 'foo',
             uri: 'example.net',
