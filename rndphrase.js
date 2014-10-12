@@ -170,15 +170,15 @@
         self.generator = function (passwd) {
             // produce secure hash from seed, password and host
             return function() {
-                passwd = self.pack(hash(hash(hash(hash(self.passwd + '$' + self.uri) + self.seed) + self.passwd) + self.version));
-                return passwd;
+                self.passwd = self.pack(hash(hash(hash(hash(self.passwd + '$' + self.uri) + self.seed) + self.passwd) + self.version));
+                return self.passwd;
             }
         }
 
         self.state = self.generator(self.passwd);
 
         self.generate = function(password) {
-            if(password) self.state = self.generator(password)
+            if(password) self.state = self.generator(password);
             return self.state();
         }
     }

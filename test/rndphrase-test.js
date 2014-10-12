@@ -35,6 +35,17 @@ describe('RndPhrase', function () {
         done();
     });
 
+    it('Should be different', function(done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar'
+        });
+
+        assert.notEqual(r.generate(), r.generate());
+        done();
+    });
+
     it('Should hash differently', function(done) {
         var r1 = new RndPhrase({
             seed: 'foo',
