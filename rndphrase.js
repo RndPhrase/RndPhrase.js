@@ -24,14 +24,14 @@
     }
 
     function validate(hash, sources, size) {
-            for(var s in sources) {
-                if(sources[s].min > 0) {
-                    if(sources[s].count < sources[s].min) {
-                        return false;
-                    }
+        for(var s in sources) {
+            if(sources[s].min > 0) {
+                if(sources[s].count < sources[s].min) {
+                    return false;
                 }
             }
-            return hash.length >= size;
+        }
+        return hash.length >= size;
     }
 
     function RndPhrase(config) {
