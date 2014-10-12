@@ -137,13 +137,9 @@
                 try {
                     var c;
 
-                    if(m % divisor) {
-                        do {
-                            c = getInt(n);
-                        } while(c >= (m - (m % divisor)));
-                    } else {
+                    do {
                         c = getInt(n);
-                    }
+                    } while(c >= m - (m % divisor));
                     c = c % divisor; //cap to full alphabet length
 
                     var choice = 0;
