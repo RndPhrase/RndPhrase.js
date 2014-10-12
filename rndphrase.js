@@ -122,25 +122,31 @@
                     unpacked += hash(hash(hash(tmp) + unpacked) + size);
                 }
 
-                n = parseInt(unpacked.substring(0,size), 16);
+                var n = parseInt(unpacked.substring(0,size), 16);
                 unpacked = unpacked.substring(size);
                 return n;
             }
 
             var tmp = '';
 
+            //Figure out how big ints we need
+            //we calculate it here for consistency
+            var n = 0;
+            while(Math.pow(16, n) < divisor) n++;
+            m = Math.pow(16, n);
+
             while(!validate(tmp, sources, Math.min(min_size, size))) {
                 try {
                     var c;
-                    //here are magic constants, they should dynamically reflect the full alphabet size
-                    if(256 % divisor) {
+
+                    if(m % divisor) {
                         do {
-                            c = getInt(2);
-                        } while(c > (254 - (255 % divisor)))
+                            c = getInt(n);
+                        } while(c > ((m-2) - ((m-1) % divisor)))
                     } else {
-                        c = getInt(2);
+                        c = getInt(n);
                     }
-                    c = c % divisor;
+                    c = c % divisor; //cap to full alphabet length
 
                     var choice = 0;
                     while(c >= sources[choice].alphabet.length) {
