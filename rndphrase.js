@@ -140,7 +140,7 @@
                     if(m % divisor) {
                         do {
                             c = getInt(n);
-                        } while(c > ((m-2) - ((m-1) % divisor)))
+                        } while(c >= (m - (m % divisor)));
                     } else {
                         c = getInt(n);
                     }
