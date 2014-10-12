@@ -93,12 +93,15 @@
             if(special) sources.push(special);
 
             var min_size = 0;
-            
+            var divisor = 0;
+
             if(!sources.length) {
                 throw new Error("RndPhrase: Could not generate valid hash.")
             }
 
             //if max for each source is zero, we remove it
+            //also do some other initialization
+            //this is so ugly.. :S
             for(var i = 0; i < sources.length; i++) {
                 if(!sources[i].min && !sources[i].max){
                     sources.splice(i,1);
@@ -109,6 +112,7 @@
                         min_size += size;
                     }
                     sources[i].count = 0;
+                    divisor += sources[i].alphabet.length;
                 }
             }
 
@@ -127,31 +131,28 @@
 
             while(!validate(tmp, sources, Math.min(min_size, size))) {
                 try {
-                    var integer;
-                    if(16 % sources.length) {
-                        do {
-                            integer = getInt(1);
-                        } while(integer > (14 - (15 % sources.length)))
-                    } else {
-                        integer = getInt(1);
-                    }
-                    
-                    choice = integer % sources.length;
-                    source = sources[choice];
-
                     var c;
-
-                    if(256 % source.alphabet.length) {
+                    //here are magic constants, they should dynamically reflect the full alphabet size
+                    if(256 % divisor) {
                         do {
                             c = getInt(2);
-                        } while(c > (254 - (255 % source.alphabet.length)))
+                        } while(c > (254 - (255 % divisor)))
                     } else {
                         c = getInt(2);
                     }
+                    c = c % divisor;
 
-                    tmp += source.alphabet.charAt(c % source.alphabet.length);
+                    var choice = 0;
+                    while(c >= sources[choice].alphabet.length) {
+                        c -= sources[choice].alphabet.length;
+                        choice++;
+                    }
+
+                    var source = sources[choice];
+                    tmp += source.alphabet.charAt(c);
                     sources[choice].count++;
                     if(source.max >= source.min && sources[choice].count >= source.max) {
+                        divisor -= source.alphabet.length;
                         sources.splice(choice, 1);
                     }
                 } catch(e) {
