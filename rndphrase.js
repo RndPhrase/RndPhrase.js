@@ -173,7 +173,7 @@
                 passwd = self.pack(hash(hash(hash(hash(self.passwd + '$' + self.uri) + self.seed) + self.passwd) + self.version));
                 return passwd;
             }
-        };
+        }
 
         self.state = self.generator(self.passwd);
 
@@ -188,7 +188,7 @@
         generator: function () {
             throw new Error('RndPhrase: No generator installed');
         }
-    };
+    }
 
     return RndPhrase;
 }));
