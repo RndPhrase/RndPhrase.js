@@ -9,7 +9,7 @@
         module.exports = factory(require('cubehash.js'));
     } else {
         // Browser globals (root is window)
-        root.returnExports = factory(root.cubehash);
+        root.rndphrase = factory(root.cubehash);
     }
 }(this, function (hash) {
 
