@@ -13,6 +13,30 @@
     }
 }(this, function (hash) {
 
+
+    function is_capital(c) {
+        var cc = c.charCodeAt(0);
+        return cc > 64 && 91 > cc;
+    }
+
+    function is_minuscule(c) {
+        var cc = c.charCodeAt(0);
+        return cc > 96 && 123 > cc;
+    }
+    
+    function is_numeric(c) {
+        var cc = c.charCodeAt(0);
+        return 47 < cc && cc < 58;
+    }
+
+    function is_special(c) {
+        var cc = c.charCodeAt(0);
+        return (31 > cc && cc < 48 ||
+                cc > 57 && cc < 65 ||
+                cc > 90 && cc < 97 ||
+                cc > 122 && cc < 127);
+    }
+
    function setup_source(source, alphabet) {
         s = source || {};
         var min = parseInt(s.min);
@@ -64,55 +88,37 @@
         }
 
         self.capital = config.capital;
-        if(self.capital !== false) {
-            self.capital = setup_source(self.capital, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-        }
+        // if(self.capital !== false) {
+        //     self.capital = setup_source(self.capital, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        // }
 
         self.minuscule = config.minuscule;
-        if(self.minuscule !== false) {
-            self.minuscule = setup_source(self.minuscule, 'abcdefghijklmnopqrstuvwxyz');
-        }
+        // if(self.minuscule !== false) {
+        //     self.minuscule = setup_source(self.minuscule, 'abcdefghijklmnopqrstuvwxyz');
+        // }
 
         self.numeric = config.numeric;
-        if(self.numeric !== false) {
-            self.numeric = setup_source(self.numeric, '0123456789');
-        }
+        // if(self.numeric !== false) {
+        //     self.numeric = setup_source(self.numeric, '0123456789');
+        // }
 
         self.special = config.special;
-        if(self.special !== false) {
-            self.special = setup_source(self.special, " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
+        // if(self.special !== false) {
+        //     self.special = setup_source(self.special, " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
+        // }
+
+        self.alphabet = config.alphabet;
+        if(!self.alphabet) {
+            self.alphabet = [];
+            for(var i = 32; i < 127; i++) {
+                self.alphabet.push(String.fromCharCode(i));
+            }
+        } else {
+            self.alphabet.split('').sort();
         }
-
+        
+        
         self.pack = function(unpacked) {
-            var sources = [];
-            if(self.capital) sources.push(self.capital);
-            if(self.minuscule) sources.push(self.minuscule);
-            if(self.numeric) sources.push(self.numeric);
-            if(self.special) sources.push(self.special);
-
-            var min_size = 0;
-            var divisor = 0;
-
-            if(!sources.length) {
-                throw new Error("RndPhrase: Could not generate valid hash.");
-            }
-
-            //if max for each source is zero, we remove it
-            //also do some other initialization
-            //this is so ugly.. :S
-            for(var i = 0; i < sources.length; i++) {
-                if(!sources[i].min && !sources[i].max){
-                    sources.splice(i,1);
-                } else {
-                    if(sources[i].max >= sources[i].min) {
-                        min_size += sources[i].max;
-                    } else {
-                        min_size += self.size;
-                    }
-                    sources[i].count = 0;
-                    divisor += sources[i].alphabet.length;
-                }
-            }
 
             function getInt(size) {
                 if(unpacked.length < size) {
@@ -126,6 +132,7 @@
             }
 
             var tmp = '';
+            var divisor = self.alphabet.length;
 
             //Figure out how big ints we need
             //we calculate it here for consistency
@@ -133,28 +140,34 @@
             while(Math.pow(16, n) < divisor) n++;
             var m = Math.pow(16, n);
 
-            while(!validate(tmp, sources, Math.min(min_size, self.size))) {
+
+            //while(!validate(tmp, sources, Math.min(min_size, self.size))) {
+            while(tmp.length <= self.size) {
                 try {
+                    var idx;
                     var c;
 
                     do {
-                        c = getInt(n);
-                    } while(c >= m - (m % divisor));
-                    c = c % divisor; //cap to full alphabet length
+                        idx = getInt(n);
+                    } while(idx >= m - (m % divisor));
 
-                    var choice = 0;
+                    c = self.alphabet[idx % divisor];
+                    tmp += c;
+                    //c = c % divisor; //cap to full alphabet length
+
+                    /*var choice = 0;
                     while(c >= sources[choice].alphabet.length) {
                         c -= sources[choice].alphabet.length;
                         choice++;
-                    }
+                    }*/
 
-                    var source = sources[choice];
+                    /*var source = sources[choice];
                     tmp += source.alphabet.charAt(c);
                     sources[choice].count++;
                     if(source.max >= source.min && sources[choice].count >= source.max) {
                         divisor -= source.alphabet.length;
                         sources.splice(choice, 1);
-                    }
+                    }*/
                 } catch(e) {
                     //This is most likely due to our bag of ints running short of numbers.
                     throw new Error("RndPhrase: Could not generate valid hash.");
