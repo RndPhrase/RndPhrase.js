@@ -81,7 +81,7 @@ describe('RndPhrase', function () {
         assert.notEqual(r.generate(), r2.generate());
         done();
     });
-/*
+
     it('Should contain 4 As', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
@@ -148,7 +148,7 @@ describe('RndPhrase', function () {
         assert.equal(4, count('-', hash));
         done();
     });
-*/
+
     it('Should be long', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
@@ -159,7 +159,7 @@ describe('RndPhrase', function () {
         assert(42 <= r.generate().length);
         done();
     });
-/*
+
     it('Should be 8 digits long', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
@@ -174,7 +174,7 @@ describe('RndPhrase', function () {
         assert.equal(8, r.generate().length);
         done();
     });
-*//*
+
     it('Should be minimum 10 digits long', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
@@ -242,8 +242,8 @@ describe('RndPhrase', function () {
             special: { max: 2 },
             size: 16
         });
-        
-        assert.equal(16, r.generate().length);
+
+        assert(16 <= r.generate().length);
 
 
         var r = new RndPhrase({
@@ -256,7 +256,7 @@ describe('RndPhrase', function () {
             special: { max: 2 },
             size: 16
         });
-        assert(16, r.generate().length);
+        assert(16 <= r.generate().length);
 
 
         var r = new RndPhrase({
@@ -269,7 +269,7 @@ describe('RndPhrase', function () {
             special: { max: 2 },
             size: 16
         });
-        assert(16, r.generate().length);
+        assert(16 <= r.generate().length);
 
 
         var r = new RndPhrase({
@@ -282,9 +282,22 @@ describe('RndPhrase', function () {
             special: { min: 2, max: 1 },
             size: 16
         });
-        assert.equal(16, r.generate().length);
+        assert(16 <= r.generate().length);
 
         done();
     });
-*/
+
+    it('Should use specified alphabet', function(done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            size: 8,
+            alphabet: 'aA0-'
+        });
+        assert(r.generate().split('').every(function(v) {
+            return v == 'a' || v == 'A' || v == '0' || v == '-';
+        }));
+        done();
+    });
 });

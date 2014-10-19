@@ -47,14 +47,6 @@
         return s;
     }
 
-    function validate(h, rules, size) {
-        for(var r in rules) {
-            var rule = rules[r];
-            if(rule.count < rule.min) return false;
-        }
-
-        return h.length >= size;
-    }
 
     function RndPhrase(config) {
         var self = this,
@@ -151,16 +143,31 @@
             };
         }
 
+        self.validate = config.validate || function validate(h, rules, size) {
+            for(var r in rules) {
+                var rule = rules[r];
+                if(rule.count < rule.min) return false;
+            }
+
+            return h.length >= size;
+        };
+
+        self.alphabet = config.alphabet;
+
         self.generate_alphabet = function(rules) {
             var alpha = ''
-            
-            for(var r in rules) {
-                alpha += rules[r].alphabet
+            if(self.alphabet) {
+                alpha = self.alphabet;
+            } else {
+                for(var r in rules) {
+                    alpha += rules[r].alphabet
+                }
             }
-            
+
             //this requires Javascript 1.6
             return alpha.split('').filter(function(v, i, s) {
-                return s.indexOf(v) === i;
+                is_char = is_capital(v) || is_minuscule(v) || is_numeric(v) || is_special(v);
+                return s.indexOf(v) === i && is_char;
             }).sort();
         }
         
@@ -214,7 +221,7 @@
             while(Math.pow(16, n) < divisor) n++;
             var m = Math.pow(16, n);
 
-            while(!validate(tmp, metadata, Math.min(min_size, self.size))) {
+            while(!self.validate(tmp, metadata, Math.min(min_size, self.size))) {
                 try {
                     var idx;
                     var c;
