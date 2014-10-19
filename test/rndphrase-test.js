@@ -300,4 +300,39 @@ describe('RndPhrase', function () {
         }));
         done();
     });
+
+    it('Should override rule alphabets', function(done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            size: 8,
+            alphabet: 'aA0-b',
+            capital: {alphabet: 'ABCDEFGHIJKLMONPQRSTUVWXYZ'},
+            minuscule: {alphabet: 'abcdefghijklmnopqrstuvwxyz'},
+            numeric: {alphabet: '0123456789'},
+            special: {alphabet: ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'}
+        });
+
+        assert(r.generate().split('').every(function(v) {
+            return v == 'a' || v == 'A' || v == '0' || v == '-';
+        }));
+
+        done();
+    });
+
+    it('Should ignore the order', function(done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar',
+            size: 8,
+            alphabet: 'aA0-b',
+            capital: {alphabet: 'ABCDEFGHIJKLMONPQRSTUVWXYZ'},
+            minuscule: {alphabet: 'abcdefghijklmnopqrstuvwxyz'},
+            numeric: {alphabet: '0123456789'},
+            special: {alphabet: ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'}
+        });
+        done();
+    });
 });
