@@ -151,7 +151,7 @@
             };
         }
 
-        self.createAlphabet = function(rules) {
+        self.generate_alphabet = function(rules) {
             var alpha = ''
             
             for(var r in rules) {
@@ -177,6 +177,21 @@
                 return n;
             }
 
+            function charIs(c) {
+                if(is_capital(c)) {
+                    return 'capital';
+                } else if(is_minuscule(c)) {
+                    return 'minuscule';
+                } else if(is_numeric(c)) {
+                    return 'numeric';
+                } else if(is_special(c)) {
+                    return 'special';
+                } else {
+                    //non-ascii char
+                    throw new Error("Illegal character: " + c);
+                }
+            }
+
             var tmp = '';
             var metadata = self.rules;
             var min_size = 0;
@@ -187,10 +202,10 @@
                 if(md.max < md.min) {
                     min_size += self.size;
                 } else {
-                    min_size += m.max;
+                    min_size += md.max;
                 }
             }
-            var alphabet = self.createAlphabet(metadata);
+            var alphabet = self.generate_alphabet(metadata);
             var divisor = alphabet.length;
 
             //How large should the ints be?
@@ -210,23 +225,11 @@
                     } while(idx >= m - (m % divisor));
 
                     c = alphabet[idx % divisor];
-                    
-                    if(is_capital(c)) {
-                        r = 'capital';
-                    } else if(is_minuscule(c)) {
-                        r = 'minuscule';
-                    } else if(is_numeric(c)) {
-                        r = 'numeric';
-                    } else if(is_special(c)) {
-                        r = 'special';
-                    } else {
-                        //non-ascii char
-                        throw new Error("Illegal character: " + c);
-                    }
+                    r = charIs(c);
 
                     if(metadata[r].max >= metadata[r].min && metadata[r].count >= metadata[r].max) {
                         delete metadata[r];
-                        alphabet = self.createAlphabet(metadata);
+                        alphabet = self.generate_alphabet(metadata);
                         divisor = alphabet.length;
                         continue;
                     }
