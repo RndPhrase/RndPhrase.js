@@ -11,7 +11,7 @@
         // Browser globals (root is window)
         root.rndphrase = factory(root.cubehash);
     }
-}(this, function (hash) {
+}(this, function (hmac) {
 
 
     function is_capital(c) {
@@ -56,7 +56,13 @@
 
         config = config || {};
 
-        self.seed = hash(config.seed || '');
+
+        self.hash = function(seed, data) {
+            return hmac(seed + data)
+        }
+
+
+        self.seed = self.hash('', config.seed || '');
 
         if (!config.uri) {
             throw new Error('RndPhrase: Missing hostname in configuration');
@@ -170,14 +176,19 @@
                 return s.indexOf(v) === i && is_char;
             }).sort();
         }
-        
+
 
         self.pack = function(unpacked) {
 
             function getInt(size) {
                 if(unpacked.length < size) {
                     //maybe we can also use the alphabets or something for adding more entropy
-                    unpacked += hash(hash(hash(tmp) + unpacked) + size);
+                    unpacked += self.hash(
+                                    self.hash(
+                                        self.hash('',tmp),
+                                        unpacked),
+                                    size
+                                );
                 }
                 var n = parseInt(unpacked.substring(0,size), 16);
                 unpacked = unpacked.substring(size);
@@ -253,7 +264,15 @@
         self.generator = function (passwd) {
             // produce secure hash from seed, password and host
             return function() {
-                self.passwd = self.pack(hash(hash(hash(hash(self.passwd + '$' + self.uri) + self.seed) + self.passwd) + self.version));
+                self.passwd = self.pack(
+                    self.hash(
+                        self.hash(
+                            self.hash(
+                                self.hash(self.passwd, '$' + self.uri),
+                                self.seed),
+                            self.passwd),
+                        self.version)
+                    );
                 return self.passwd;
             };
         };
