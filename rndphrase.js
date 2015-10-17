@@ -23,7 +23,7 @@
         var cc = c.charCodeAt(0);
         return cc > 96 && 123 > cc;
     }
-    
+
     function is_numeric(c) {
         var cc = c.charCodeAt(0);
         return 47 < cc && cc < 58;
@@ -93,7 +93,7 @@
             for(var cc = 65; cc < 91; cc++) {
                 alpha += String.fromCharCode(cc);
             }
-            
+
             self.rules.capital = {
                 'min': cfg.min || 1,
                 'max': cfg.max || 0,
@@ -108,7 +108,7 @@
             for(var cc = 97; cc < 123; cc++) {
                 alpha += String.fromCharCode(cc);
             }
-            
+
             self.rules.minuscule = {
                 'min': cfg.min || 1,
                 'max': cfg.max || 0,
@@ -179,13 +179,12 @@
 
 
         self.pack = function(unpacked) {
-
             function getInt(size) {
                 if(unpacked.length < size) {
                     //maybe we can also use the alphabets or something for adding more entropy
                     unpacked += self.hash(
                                     self.hash(
-                                        self.hash('',tmp),
+                                        self.hash('', tmp),
                                         unpacked),
                                     size
                                 );
@@ -237,7 +236,7 @@
                     var idx;
                     var c;
                     var r;
-                    
+
                     do {
                         idx = getInt(n);
                     } while(idx >= m - (m % divisor));
