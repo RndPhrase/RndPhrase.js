@@ -18,6 +18,16 @@ describe('RndPhrase', function () {
         done();
     });
 
+    it('Should have hash', function(done) {
+        var r = new RndPhrase({
+            seed: 'foo',
+            uri: 'example.net',
+            password: 'bar'
+        });
+        assert.equal(r.generate(), '/xqmAfKvcPuluw(J=AZsQkaLM.+++0');
+        done();
+    });
+
     it('Should hash deterministically', function (done) {
         var r1 = new RndPhrase({
             seed: 'foo',
@@ -51,12 +61,12 @@ describe('RndPhrase', function () {
             seed: 'foo',
             uri: 'example.net'
         });
-        
+
         var r2 = new RndPhrase({
             seed: 'foo',
             uri: 'example.com'
         });
-        
+
         assert.notEqual(r1.generate('baz'), r2.generate('baz'));
         assert.notEqual(r1.generate(), r2.generate());
 
@@ -70,7 +80,7 @@ describe('RndPhrase', function () {
             password: 'bar',
             version: 1
         });
-        
+
         var r2 = new RndPhrase({
             seed: 'foo',
             uri: 'example.net',
@@ -186,7 +196,7 @@ describe('RndPhrase', function () {
             special: { max: 2 },
             size: 10
         });
-        
+
         assert(10 <= r.generate().length);
 
 
