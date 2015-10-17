@@ -1,11 +1,11 @@
 {
-  "name": "RndPhrase.js",
+  "name": "rndphrase",
   "description": "This small module will replace your everyday passwords with secure per domain passwords.",
-  "author": "Johan Brinch <brinchj@gmail.com>",
+  "author": "Ronni Elken Lindsgaard <rel@zx.dk>",
   "maintainers": [
     {
         "name": "Ronni Lindsgaard",
-        "email": "ronni.lindsgaard@gmail.com",
+        "email": "rel@zx.dk",
         "web": "http://rlindsgaard.github.io/"
     }
   ],
