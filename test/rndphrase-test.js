@@ -24,7 +24,10 @@ describe('RndPhrase', function () {
             uri: 'example.net',
             password: 'bar'
         });
-        assert.equal(r.generate(), '/xqmAfKvcPuluw(J=AZsQkaLM.+++0');
+        assert.equal(
+            r.generate(),
+            '/xqmAfKvcPuluw(J=AZsQkaL!yN_trr?Wq/w!q[]a)7'
+        );
         done();
     });
 

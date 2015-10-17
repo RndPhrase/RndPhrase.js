@@ -193,19 +193,24 @@
         }
 
 
-        self.pack = function(unpacked) {
+        self.pack = function(prn) {
+            var usedHash = '';
             function getInt(size) {
-                if(unpacked.length < size) {
-                    //maybe we can also use the alphabets or something for adding more entropy
-                    unpacked += self.hash(
-                                    self.hash(
-                                        self.hash('', tmp),
-                                        unpacked),
-                                    size
-                                );
+                // Do this to emulate a stream cipher.
+                if(prn.length < size) {
+                    prn += self.hash(
+                                self.hash(
+                                    self.hash(usedHash, tmp),
+                                    prn),
+                                // Size remains constant based
+                                // on start alphabet size
+                                size
+                            );
                 }
-                var n = parseInt(unpacked.substring(0,size), 16);
-                unpacked = unpacked.substring(size);
+                var hexa = prn.substring(0, size)
+                var n = parseInt(hexa, 16);
+                prn = prn.substring(size);
+                usedHash += hexa;
                 return n;
             }
 
