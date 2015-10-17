@@ -12,7 +12,21 @@
         root.rndphrase = factory(root.cubehash);
     }
 }(this, function (hmac) {
-
+    // Private module methods
+    function charIs(c) {
+        if(is_capital(c)) {
+            return 'capital';
+        } else if(is_minuscule(c)) {
+            return 'minuscule';
+        } else if(is_numeric(c)) {
+            return 'numeric';
+        } else if(is_special(c)) {
+            return 'special';
+        } else {
+            //non-ascii char
+            throw new Error("Illegal character: " + c);
+        }
+    }
 
     function is_capital(c) {
         var cc = c.charCodeAt(0);
@@ -48,6 +62,7 @@
     }
 
 
+    // The RndPhrase object being exported
     function RndPhrase(config) {
         var self = this,
             host,
@@ -192,21 +207,6 @@
                 var n = parseInt(unpacked.substring(0,size), 16);
                 unpacked = unpacked.substring(size);
                 return n;
-            }
-
-            function charIs(c) {
-                if(is_capital(c)) {
-                    return 'capital';
-                } else if(is_minuscule(c)) {
-                    return 'minuscule';
-                } else if(is_numeric(c)) {
-                    return 'numeric';
-                } else if(is_special(c)) {
-                    return 'special';
-                } else {
-                    //non-ascii char
-                    throw new Error("Illegal character: " + c);
-                }
             }
 
             var tmp = '';
