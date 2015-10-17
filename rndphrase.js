@@ -213,6 +213,8 @@
             var metadata = self.rules;
             var min_size = 0;
             var alpha = '';
+
+            // Do some preprocessing in order to generate alphabet properly
             for(var k in metadata) {
                 var md = metadata[k];
                 metadata[k].count = 0;
@@ -227,31 +229,41 @@
 
             //How large should the ints be?
             //Put here so we always pick the same size consistently
-            var n = 0;
-            while(Math.pow(16, n) < divisor) n++;
-            var m = Math.pow(16, n);
+            var intSize = 0;
+            // Figure out which integer size to use, 16 is the
+            // range of the pseudorandom number
+            while(Math.pow(16, intSize) < divisor) intSize++;
+            // And then where we want to wrap it, maxIntVal < divisor
+            var maxIntVal = Math.pow(16, intSize);
 
             while(!self.validate(tmp, metadata, Math.min(min_size, self.size))) {
                 try {
                     var idx;
-                    var c;
-                    var r;
+                    var nextChar;
+                    var charType;
 
+                    // Get the next index in the alphabet, while
+                    // part here is for wrapping so there is no
+                    // bias.
                     do {
-                        idx = getInt(n);
-                    } while(idx >= m - (m % divisor));
+                        idx = getInt(intSize);
+                    } while(idx >= maxIntVal - (maxIntVal % divisor));
 
-                    c = alphabet[idx % divisor];
-                    r = charIs(c);
+                    nextChar = alphabet[idx % divisor];
+                    charType = charIs(nextChar);
 
-                    if(metadata[r].max >= metadata[r].min && metadata[r].count >= metadata[r].max) {
-                        delete metadata[r];
+                    // Regenerate alphabet if necessary
+                    var typeMetadata = metadata[charType]
+                    if(typeMetadata.max >= typeMetadata.min &&
+                       typeMetadata.count >= typeMetadata.max) {
+                        delete metadata[charType];
                         alphabet = self.generate_alphabet(metadata);
                         divisor = alphabet.length;
                         continue;
                     }
-                    tmp += c;
-                    metadata[r].count++;
+
+                    tmp += nextChar;
+                    metadata[charType].count++;
                 } catch(e) {
                     console.log(e);
                     throw new Error("RndPhrase: Could not generate valid hash.");
