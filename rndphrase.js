@@ -193,28 +193,28 @@
         }
 
 
-        self.pack = function(prn) {
-            var usedHash = '';
-            function getInt(size) {
+        self.pack = function(prnString) {
+            function getPrn(size) {
                 // Do this to emulate a stream cipher.
-                if(prn.length < size) {
-                    prn += self.hash(
-                                self.hash(
-                                    self.hash(usedHash, tmp),
-                                    prn),
-                                // Size remains constant based
-                                // on start alphabet size
-                                size
-                            );
+                if(prnString.length < size) {
+                    prnString += self.hash(
+                        self.hash(
+                            self.hash(usedPrn, passwordCandidate),
+                            prnString),
+                        // Size remains constant based
+                        // on start alphabet size
+                        size
+                    );
                 }
-                var hexa = prn.substring(0, size)
+                var hexa = prnString.substring(0, size)
                 var n = parseInt(hexa, 16);
-                prn = prn.substring(size);
-                usedHash += hexa;
+                prnString = prnString.substring(size);
+                usedPrn += hexa;
                 return n;
             }
 
-            var tmp = '';
+            var usedPrn = '';
+            var passwordCandidate = '';
             var metadata = self.rules;
             var min_size = 0;
             var alpha = '';
@@ -234,14 +234,19 @@
 
             //How large should the ints be?
             //Put here so we always pick the same size consistently
-            var intSize = 0;
-            // Figure out which integer size to use, 16 is the
-            // range of the pseudorandom number
-            while(Math.pow(16, intSize) < divisor) intSize++;
-            // And then where we want to wrap it, maxIntVal < divisor
-            var maxIntVal = Math.pow(16, intSize);
+            var prnSize = 0;
+            // Figure out the number of bytes to use for the pseudo
+            // random number. Range of prnString is 16.
+            while(Math.pow(16, prnSize) < divisor) prnSize++;
+            // And then where we want to wrap it, maxPrnVal < divisor
+            var maxPrnVal = Math.pow(16, prnSize);
 
-            while(!self.validate(tmp, metadata, Math.min(min_size, self.size))) {
+            while(
+                !self.validate(
+                    passwordCandidate,
+                    metadata,
+                    Math.min(min_size, self.size))
+            ) {
                 try {
                     var idx;
                     var nextChar;
@@ -251,8 +256,8 @@
                     // part here is for wrapping so there is no
                     // bias.
                     do {
-                        idx = getInt(intSize);
-                    } while(idx >= maxIntVal - (maxIntVal % divisor));
+                        idx = getPrn(prnSize);
+                    } while(idx >= maxPrnVal - (maxPrnVal % divisor));
 
                     nextChar = alphabet[idx % divisor];
                     charType = charIs(nextChar);
@@ -267,14 +272,14 @@
                         continue;
                     }
 
-                    tmp += nextChar;
+                    passwordCandidate += nextChar;
                     metadata[charType].count++;
                 } catch(e) {
                     console.log(e);
                     throw new Error("RndPhrase: Could not generate valid hash.");
                 }
             }
-            return tmp;
+            return passwordCandidate;
         };
 
         self.generator = function (passwd) {
