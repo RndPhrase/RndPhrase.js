@@ -201,8 +201,6 @@
                         self.hash(
                             self.hash(usedPrn, passwordCandidate),
                             prnString),
-                        // Size remains constant based
-                        // on start alphabet size
                         size
                     );
                 }
@@ -269,6 +267,9 @@
                         delete metadata[charType];
                         alphabet = self.generate_alphabet(metadata);
                         divisor = alphabet.length;
+                        prnSize = 0;
+                        while(Math.pow(16, prnSize) < divisor) prnSize++;
+                        maxPrnVal = Math.pow(16, prnSize);
                         continue;
                     }
 
