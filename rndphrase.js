@@ -100,6 +100,7 @@
 
         self.rules = {};
 
+        // Configure capital letters
         self.capital = config.capital;
         if(config.capital !== false) {
             var alpha = '';
@@ -116,6 +117,7 @@
             };
         }
 
+        // Configure minuscule letters
         self.minuscule = config.minuscule;
         if(self.minuscule !== false) {
             var alpha = '';
@@ -131,6 +133,7 @@
             };
         }
 
+        // Configure numeric characters
         self.numeric = config.numeric;
         if(self.numeric !== false) {
             var alpha = '';
@@ -145,6 +148,7 @@
             };
         }
 
+        // Configure special characters
         self.special = config.special;
         if(self.special !== false) {
             var cc = 32;
@@ -187,7 +191,10 @@
 
             //this requires Javascript 1.6
             return alpha.split('').filter(function(v, i, s) {
-                is_char = is_capital(v) || is_minuscule(v) || is_numeric(v) || is_special(v);
+                is_char = (is_capital(v) ||
+                           is_minuscule(v) ||
+                           is_numeric(v) ||
+                           is_special(v));
                 return s.indexOf(v) === i && is_char;
             }).sort();
         }
@@ -215,7 +222,6 @@
             var passwordCandidate = '';
             var metadata = self.rules;
             var min_size = 0;
-            var alpha = '';
 
             // Do some preprocessing in order to generate alphabet properly
             for(var k in metadata) {
@@ -299,6 +305,7 @@
             };
         };
 
+        // Initiate the generator state
         self.state = self.generator(self.passwd);
 
         self.generate = function(password) {
