@@ -206,7 +206,7 @@
                 if(prnString.length < size) {
                     prnString += self.hash(
                         self.hash(
-                            self.hash(usedPrn, passwordCandidate),
+                            self.hash(self.seed, passwordCandidate),
                             prnString),
                         size
                     );

@@ -26,7 +26,7 @@ describe('RndPhrase', function () {
         });
         assert.equal(
             r.generate(),
-            '/xqmAfKvcPuluw(J=AZsQkaL!yN_trr?Wq/w!q[]a)7'
+            '/xqmAfKvcPuluw(J=AZsQkaL/)!Wn8'
         );
         done();
     });
