@@ -51,17 +51,6 @@
                 (cc > 122 && cc < 127));
     }
 
-   function setup_source(source, alphabet) {
-        s = source || {};
-        var min = parseInt(s.min);
-        if(isNaN(min)) s.min = 1;
-        var max = parseInt(s.max);
-        if(isNaN(s.max)) s.max = 0;
-        // if(!s.alphabet) s.alphabet = alphabet;
-        return s;
-    }
-
-
     // The RndPhrase object being exported
     function RndPhrase(config) {
         var self = this,
@@ -71,14 +60,11 @@
 
         config = config || {};
 
-
         self.hash = function(seed, data) {
             return hmac(seed + data)
         }
 
-
         self.seed = config.seed || '';
-
 
         self.uri = config.uri;
 
@@ -165,17 +151,18 @@
             };
         }
 
+        // Validate a password against rules
         self.validate = config.validate || function validate(h, rules, size) {
             for(var r in rules) {
                 var rule = rules[r];
                 if(rule.count < rule.min) return false;
             }
-
             return h.length >= size;
         };
 
         self.alphabet = config.alphabet;
 
+        // Create an alphabet string based on the current rules
         self.generate_alphabet = function(rules) {
             var alpha = ''
             if(self.alphabet) {
@@ -196,7 +183,7 @@
             }).sort();
         }
 
-
+        // Create the actual password from a given hash
         self.pack = function(prnString) {
             function getNextChar(alphabet, size) {
                 var divisor = alphabet.length;
@@ -277,7 +264,7 @@
                 }
             }
             return passwordCandidate;
-        };
+        }
 
         self.generator = function (passwd) {
             // produce secure hash from seed, password and host
@@ -292,8 +279,8 @@
                         self.version)
                     );
                 return self.passwd;
-            };
-        };
+            }
+        }
 
         self.generate = function(password) {
             if(password) {
@@ -306,7 +293,7 @@
             }
 
             return self.state();
-        };
+        }
     }
 
     RndPhrase.prototype = {
