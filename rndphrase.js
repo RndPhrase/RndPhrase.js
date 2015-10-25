@@ -77,7 +77,7 @@
         }
 
 
-        self.seed = self.hash('', config.seed || '');
+        self.seed = config.seed || '';
 
         if (!config.uri) {
             throw new Error('RndPhrase: Missing hostname in configuration');

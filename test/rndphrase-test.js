@@ -26,7 +26,7 @@ describe('RndPhrase', function () {
         });
         assert.equal(
             r.generate(),
-            '/xqmAfKvcPuluw(J=AZsQkaL/)!Wn8'
+            'xWDWe*CF^:A|BJ97'
         );
         done();
     });
@@ -319,16 +319,20 @@ describe('RndPhrase', function () {
             seed: 'foo',
             uri: 'example.net',
             password: 'bar',
-            size: 8,
-            alphabet: 'aA0-b',
+            size: 16,
+            alphabet: 'aA0-',
             capital: {alphabet: 'ABCDEFGHIJKLMONPQRSTUVWXYZ'},
             minuscule: {alphabet: 'abcdefghijklmnopqrstuvwxyz'},
             numeric: {alphabet: '0123456789'},
             special: {alphabet: ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'}
         });
 
-        assert(r.generate().split('').every(function(v) {
-            return v == 'a' || v == 'A' || v == '0' || v == '-';
+        hash = r.generate()
+        assert(hash.split('').every(function(v) {
+            return v == 'a'
+                || v == 'A'
+                || v == '0'
+                || v == '-';
         }));
 
         done();
