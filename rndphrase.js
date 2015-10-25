@@ -79,9 +79,6 @@
 
         self.seed = config.seed || '';
 
-        if (!config.uri) {
-            throw new Error('RndPhrase: Missing hostname in configuration');
-        }
 
         self.uri = config.uri;
 
@@ -298,11 +295,16 @@
             };
         };
 
-        // Initiate the generator state
-        self.state = self.generator(self.passwd);
-
         self.generate = function(password) {
-            if(password) self.state = self.generator(password);
+            if(password) {
+                self.state = self.generator(password)
+            } else if(self.state === undefined) {
+                if (undefined === config.uri) {
+                    throw new Error('RndPhrase: Missing hostname in configuration');
+                }
+                self.state = self.generator(self.passwd);
+            }
+
             return self.state();
         };
     }
