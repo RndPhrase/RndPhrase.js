@@ -201,24 +201,28 @@
 
 
         self.pack = function(prnString) {
-            function getPrn(size) {
-                // Do this to emulate a stream cipher.
-                if(prnString.length < size) {
-                    prnString += self.hash(
-                        self.hash(
-                            self.hash(self.seed, passwordCandidate),
-                            prnString),
-                        size
-                    );
-                }
-                var hexa = prnString.substring(0, size)
-                var n = parseInt(hexa, 16);
-                prnString = prnString.substring(size);
-                usedPrn += hexa;
-                return n;
+            function getNextChar(alphabet, size) {
+                var divisor = alphabet.length;
+                var maxPrnVal = Math.pow(16, prnSize);
+
+                do {
+                    // Do this to emulate a stream cipher.
+                    if(prnString.length < size) {
+                        prnString += self.hash(
+                            self.hash(
+                                self.hash(self.seed, passwordCandidate),
+                                prnString),
+                            size
+                        );
+                    }
+                    var hexa = prnString.substring(0, size)
+                    var n = parseInt(hexa, 16);
+                    prnString = prnString.substring(size);
+                } while(n >= maxPrnVal - (maxPrnVal % divisor));
+
+                return alphabet[n % divisor];
             }
 
-            var usedPrn = '';
             var passwordCandidate = '';
             var metadata = self.rules;
             var min_size = 0;
@@ -242,8 +246,6 @@
             // Figure out the number of bytes to use for the pseudo
             // random number. Range of prnString is 16.
             while(Math.pow(16, prnSize) < divisor) prnSize++;
-            // And then where we want to wrap it, maxPrnVal < divisor
-            var maxPrnVal = Math.pow(16, prnSize);
 
             while(
                 !self.validate(
@@ -252,18 +254,10 @@
                     Math.min(min_size, self.size))
             ) {
                 try {
-                    var idx;
                     var nextChar;
                     var charType;
 
-                    // Get the next index in the alphabet, while
-                    // part here is for wrapping so there is no
-                    // bias.
-                    do {
-                        idx = getPrn(prnSize);
-                    } while(idx >= maxPrnVal - (maxPrnVal % divisor));
-
-                    nextChar = alphabet[idx % divisor];
+                    nextChar = getNextChar(alphabet, prnSize);
                     charType = charIs(nextChar);
 
                     // Regenerate alphabet if necessary
@@ -274,8 +268,7 @@
                         alphabet = self.generate_alphabet(metadata);
                         divisor = alphabet.length;
                         prnSize = 0;
-                        while(Math.pow(16, prnSize) < divisor) prnSize++;
-                        maxPrnVal = Math.pow(16, prnSize);
+                        for(; Math.pow(16, prnSize) < divisor; prnSize++);
                         continue;
                     }
 
