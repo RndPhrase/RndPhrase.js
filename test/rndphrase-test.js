@@ -51,7 +51,7 @@ describe('RndPhrase', function () {
     it('Should be different', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
-            uri: 'example.net',
+            uri: 'example.se',
             password: 'bar'
         });
 
@@ -62,12 +62,12 @@ describe('RndPhrase', function () {
     it('Should hash differently', function(done) {
         var r1 = new RndPhrase({
             seed: 'foo',
-            uri: 'example.net'
+            uri: 'example.net',
         });
 
         var r2 = new RndPhrase({
             seed: 'foo',
-            uri: 'example.com'
+            uri: 'example.se',
         });
 
         assert.notEqual(r1.generate('baz'), r2.generate('baz'));
@@ -95,81 +95,96 @@ describe('RndPhrase', function () {
         done();
     });
 
-    it('Should contain 4 As', function(done) {
+    it('Should contain exactly 4 capital letters', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
             uri: 'example.net',
             password: 'bar',
             capital: {
                 min: 4,
-                max: 4,
-                alphabet: 'A'
+                max: 4
             }
         });
 
-        assert.equal(4, count('A', r.generate()));
+        var hash = r.generate();
+        var letters = 'ABCDEFGHIJKLMONPQRSTUVWXYZ'
+        var count = 0;
+
+        for (var i = 0; i < letters.length; i++) {
+            count += hash.split(letters[i]).length - 1;
+        }
+
+        assert.equal(4, count);
         done();
     });
 
-    it('Should contain 4 as', function(done) {
+    it('Should contain exactly 4 minuscule letters', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
             uri: 'example.net',
             password: 'bar',
             minuscule: {
                 min: 4,
-                max: 4,
-                alphabet: 'a'
+                max: 4
             }
         });
+        var hash = r.generate();
+        var letters = 'abcdefghijklmnopqrstuvwxyz';
+        var count = 0;
 
-        assert.equal(4, count('a', r.generate()));
+        for (var i = 0; i < letters.length; i++) {
+            count += hash.split(letters[i]).length - 1;
+        }
+
+        assert.equal(4, count);
         done();
     });
 
-    it('Should contain 4 1s', function(done) {
+    it('Should contain exactly 4 numbers', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
             uri: 'example.net',
             password: 'bar',
             numeric: {
                 min: 4,
-                max: 4,
-                alphabet: '1'
+                max: 4
             },
             capital: false
         });
-        hash = r.generate();
-        assert.equal(4, count('1', hash));
+        var hash = r.generate();
+        var letters = '1234567890';
+        var count = 0;
+
+        for (var i = 0; i < letters.length; i++) {
+            count += hash.split(letters[i]).length - 1;
+        }
+
+        assert.equal(4, count);
         done();
     });
 
-    it('Should contain 4 -s', function(done) {
+    it('Should contain exactly 4 special characters', function(done) {
         var r = new RndPhrase({
             seed: 'foo',
             uri: 'example.net',
             password: 'bar',
             special: {
                 min: 4,
-                max: 4,
-                alphabet: '-'
+                max: 4
             },
             numeric: false,
             minuscule: false
         });
-        hash = r.generate()
-        assert.equal(4, count('-', hash));
-        done();
-    });
 
-    it('Should be long', function(done) {
-        var r = new RndPhrase({
-            seed: 'foo',
-            uri: 'example.net',
-            password: 'bar',
-            size: 42
-        });
-        assert(42 <= r.generate().length);
+        var hash = r.generate();
+        var letters = ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+        var count = 0;
+
+        for (var i = 0; i < letters.length; i++) {
+            count += hash.split(letters[i]).length - 1;
+        }
+
+        assert.equal(4, count);
         done();
     });
 
@@ -350,6 +365,52 @@ describe('RndPhrase', function () {
             numeric: {alphabet: '0123456789'},
             special: {alphabet: ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'}
         });
+        done();
+    });
+
+    it('Should validate', function(done) {
+        var r = new RndPhrase({
+            'uri': 'example.net'
+        });
+
+        // Everything of minimum size
+        assert(r.validate('aaaa', {}, 4));
+
+        // Something containing a minuscule
+        assert(r.validate('a', {
+            minuscule: {min: 1, max: 2, count: 1}
+        }, 1));
+        // Something containing a capital
+        assert(r.validate('A', {
+            capital: {min: 1, max: 2, count: 1}
+        }, 1));
+        // Something containing an integer
+        // Something containing a special character
+
+        // Overwritten validate function
+        var r2 = new RndPhrase({
+            uri: 'example.net',
+            validate: function(h, rules, size) {
+                return true;
+            }});
+        assert(r2.validate('', {}, 42));
+        done();
+    });
+
+    it('Should not validate', function(done) {
+        var r = new RndPhrase({
+            'uri': 'example.net'
+        });
+
+        // Something too small
+        assert(! r.validate('aaaa', {}, 5));
+
+        var r2 = new RndPhrase({
+            uri: 'example.net',
+            validate: function(h, rules, size) {
+                return false;
+            }});
+        assert(! r2.validate('', {}, 42));
         done();
     });
 });

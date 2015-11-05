@@ -190,19 +190,14 @@
                 var maxPrnVal = Math.pow(16, prnSize);
 
                 do {
-                    // Do this to emulate a stream cipher.
-                    if(prnString.length < size) {
-                        prnString += self.hash(
-                            self.hash(
-                                self.hash(self.seed, passwordCandidate),
-                                prnString),
-                            size
-                        );
-                    }
                     var hexa = prnString.substring(0, size)
                     var n = parseInt(hexa, 16);
                     prnString = prnString.substring(size);
                 } while(n >= maxPrnVal - (maxPrnVal % divisor));
+
+                if (isNaN(n)) {
+                    throw new Error("Not enough entropy.");
+                }
 
                 return alphabet[n % divisor];
             }
@@ -237,31 +232,26 @@
                     metadata,
                     Math.min(min_size, self.size))
             ) {
-                try {
-                    var nextChar;
-                    var charType;
+                var nextChar;
+                var charType;
 
-                    nextChar = getNextChar(alphabet, prnSize);
-                    charType = charIs(nextChar);
+                nextChar = getNextChar(alphabet, prnSize);
+                charType = charIs(nextChar);
 
-                    // Regenerate alphabet if necessary
-                    var typeMetadata = metadata[charType]
-                    if(typeMetadata.max >= typeMetadata.min &&
-                       typeMetadata.count >= typeMetadata.max) {
-                        delete metadata[charType];
-                        alphabet = self.generate_alphabet(metadata);
-                        divisor = alphabet.length;
-                        prnSize = 0;
-                        for(; Math.pow(16, prnSize) < divisor; prnSize++);
-                        continue;
-                    }
-
-                    passwordCandidate += nextChar;
-                    metadata[charType].count++;
-                } catch(e) {
-                    console.log(e);
-                    throw new Error("RndPhrase: Could not generate valid hash.");
+                // Regenerate alphabet if necessary
+                var typeMetadata = metadata[charType]
+                if(typeMetadata.max >= typeMetadata.min &&
+                   typeMetadata.count >= typeMetadata.max) {
+                    delete metadata[charType];
+                    alphabet = self.generate_alphabet(metadata);
+                    divisor = alphabet.length;
+                    prnSize = 0;
+                    for(; Math.pow(16, prnSize) < divisor; prnSize++);
+                    continue;
                 }
+
+                passwordCandidate += nextChar;
+                metadata[charType].count++;
             }
             return passwordCandidate;
         }
