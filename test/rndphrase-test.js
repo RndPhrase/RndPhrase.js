@@ -247,17 +247,17 @@ describe('RndPhrase', function () {
 
         // Something containing a minuscule
         assert(r.validate('a', {
-            minuscule: {min: 1, max: 2, count: 1}
+            minuscule: {min: 1, max: 2, count: 1, alphabet: 'a'}
         }));
 
         // Something containing a capital
         assert(r.validate('A', {
-            capital: {min: 1, max: 2, count: 1}
+            capital: {min: 1, max: 2, count: 1, alphabet: 'A'}
         }));
 
         // Something containing an integer
         assert(r.validate('2', {
-            numeric: {min: 1, max: 2, count: 1}
+            numeric: {min: 1, max: 2, count: 1, alphabet: '2'}
         }));
 
 

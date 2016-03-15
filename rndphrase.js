@@ -25,42 +25,15 @@
         return buf;
     }
 
-    function charIs(c) {
-        if(is_capital(c)) {
-            return 'capital';
-        } else if(is_minuscule(c)) {
-            return 'minuscule';
-        } else if(is_numeric(c)) {
-            return 'numeric';
-        } else if(is_special(c)) {
-            return 'special';
-        } else {
-            //non-ascii char
-            throw new Error('Illegal character: ' + c);
+    function charType(c, rules) {
+        var r;
+        for(r in rules){
+            if(rules.hasOwnProperty(r)) {
+                if(rules[r].alphabet.indexOf(c) !== -1) {
+                    return r;
+                }
+            }
         }
-    }
-
-    function is_capital(c) {
-        var cc = c.charCodeAt(0);
-        return cc > 64 && 91 > cc;
-    }
-
-    function is_minuscule(c) {
-        var cc = c.charCodeAt(0);
-        return cc > 96 && 123 > cc;
-    }
-
-    function is_numeric(c) {
-        var cc = c.charCodeAt(0);
-        return 47 < cc && cc < 58;
-    }
-
-    function is_special(c) {
-        var cc = c.charCodeAt(0);
-        return ((31 < cc && cc < 48) ||
-                (cc > 57 && cc < 65) ||
-                (cc > 90 && cc < 97) ||
-                (cc > 122 && cc < 127));
     }
 
     function setup_rule(rule, alphabet){
@@ -108,20 +81,14 @@
     function generate_alphabet(rules) {
         var r,
             alpha = '';
+
         for(r in rules) {
             if(rules.hasOwnProperty(r)) {
                 alpha += rules[r].alphabet;
             }
         }
 
-        //this requires Javascript 1.6
-        return alpha.split('').filter(function(v, i, s) {
-            var is_char = (is_capital(v) ||
-                       is_minuscule(v) ||
-                       is_numeric(v) ||
-                       is_special(v));
-            return s.indexOf(v) === i && is_char;
-        }).sort();
+        return alpha;
     }
 
     // Create the actual password from a given hash
@@ -143,7 +110,12 @@
         }
 
         var password = '';
-        var metadata = rules;
+        var metadata = {};
+        for(var r in rules){
+            if(rules.hasOwnProperty(r)) {
+                metadata[r] = rules[r];
+            }
+        }
         var min_size = 0;
 
         // Do some preprocessing in order to generate alphabet properly
@@ -162,17 +134,17 @@
         var divisor = alphabet.length;
 
         var nextChar = getNextChar(alphabet);
-        var charType;
+        var char_type;
         while(nextChar) {
-            charType = charIs(nextChar);
+            char_type = charType(nextChar, metadata);
             password += nextChar;
-            metadata[charType].count += 1;
+            metadata[char_type].count += 1;
 
             // Regenerate alphabet if necessary
-            var typeMetadata = metadata[charType];
+            var typeMetadata = metadata[char_type];
             if(typeMetadata.max >= typeMetadata.min &&
                typeMetadata.count >= typeMetadata.max) {
-                delete metadata[charType];
+                delete metadata[char_type];
                 alphabet = generate_alphabet(metadata);
                 divisor = alphabet.length;
             }
@@ -216,7 +188,7 @@
 
         // Validate a password against rules
         self.validate = config.validate || function(h, rules) {
-            var i, charType;
+            var i, char_type;
             var count = {};
 
             for(i in rules) {
@@ -226,10 +198,9 @@
             }
 
             for(i = 0; i < h.length; i += 1) {
-                charType = charIs(h.charAt(i));
-                count[charType] += 1;
+                char_type = charType(h.charAt(i), rules);
+                count[char_type] += 1;
             }
-
             for(i in rules) {
                 if(count[i] < rules[i].min) {
                     return false;
