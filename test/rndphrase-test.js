@@ -89,7 +89,7 @@ describe('RndPhrase', function () {
                     count += pass.split(letters[i]).length - 1;
                 }
 
-                assert.equal(4, count);
+                assert.equal(count, 4);
                 done();
             });
 
@@ -114,7 +114,7 @@ describe('RndPhrase', function () {
             size: 10
         });
         r.generate('bar', function(pass) {
-            assert.equal(8, pass.length);
+            assert.equal(pass.length, 8);
             done();
         });
     });
