@@ -20,11 +20,20 @@
         self.seed = config.seed || '';
         self.uri = config.uri;
         self.password = config.password || '';
-
-        self.capital = config.capital;
-        self.minuscule = config.minuscule;
-        self.numeric = config.numeric;
-        self.special = config.special;
+        self.constraints = config.constraints || {
+            'capital': setup_constraint(
+                config.capital,
+                'ABCDEFGHIJKLMONPQRSTUVWXYZ'),
+            'minuscule': setup_constraint(
+                config.minuscule,
+                'abcdefghijklmnopqrstuvwxyz'),
+            'numeric': setup_constraint(
+                config.numeric,
+                '0123456789'),
+            'special': setup_constraint(
+                config.special,
+                ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
+        }
 
         self.version = parseInt(config.version);
         if(isNaN(self.version) || self.version < 0) {
@@ -39,25 +48,10 @@
         // Generate byte array with deterministic pseudo random numbers
         self.dprng_function = config.dprng_function || dprng_function;
 
-        // Validate a password against rules
+        // Validate a password against constraints
         self.validate = config.validate || validate;
 
         self.generate = function(password, callback) {
-            var rules = {
-                'capital': setup_rule(
-                    self.capital,
-                    'ABCDEFGHIJKLMONPQRSTUVWXYZ'),
-                'minuscule': setup_rule(
-                    self.minuscule,
-                    'abcdefghijklmnopqrstuvwxyz'),
-                'numeric': setup_rule(
-                    self.numeric,
-                    '0123456789'),
-                'special': setup_rule(
-                    self.special,
-                    ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
-            };
-
             self.dprng_function(
                 (password || self.password),
                 self.seed + '$' + self.uri,
@@ -66,7 +60,7 @@
                 function(key) {
                     generate_password(
                         key,
-                        rules,
+                        self.constraints,
                         self.validate,
                         function(rndphrase) {
                             callback(rndphrase);
@@ -120,42 +114,42 @@
         }
     }
 
-    function validate(h, rules) {
+    function validate(h, constraints) {
         var i, char_type;
         var count = {};
 
-        for(i in rules) {
-            if(rules.hasOwnProperty(i)) {
+        for(i in constraints) {
+            if(constraints.hasOwnProperty(i)) {
                 count[i] = 0;
             }
         }
 
         for(i = 0; i < h.length; i += 1) {
-            char_type = charType(h.charAt(i), rules);
+            char_type = charType(h.charAt(i), constraints);
             count[char_type] += 1;
         }
-        for(i in rules) {
-            if(count[i] < rules[i].min) {
+        for(i in constraints) {
+            if(count[i] < constraints[i].min) {
                 return false;
             }
         }
         return true;
     };
 
-    function charType(c, rules) {
+    function charType(c, constraints) {
         var r;
-        for(r in rules){
-            if(rules.hasOwnProperty(r)) {
-                if(rules[r].alphabet.indexOf(c) !== -1) {
+        for(r in constraints){
+            if(constraints.hasOwnProperty(r)) {
+                if(constraints[r].alphabet.indexOf(c) !== -1) {
                     return r;
                 }
             }
         }
     }
 
-    function setup_rule(rule, alphabet){
-        if (rule !== false){
-            var cfg = rule || {};
+    function setup_constraint(constraint, alphabet){
+        if (constraint !== false){
+            var cfg = constraint || {};
             return {
                 'min': cfg.min || 1,
                 'max': cfg.max || 0,
@@ -165,7 +159,7 @@
     }
 
     // Create the actual password from a given hash
-    function generate_password(bytes, rules, validate, callback) {
+    function generate_password(bytes, constraints, validate, callback) {
         function getNextChar(alphabet) {
             var dprn,
                 divisor = alphabet.length,
@@ -184,7 +178,7 @@
         }
 
         var password = '';
-        var current_constraints = init_current_constraints(rules);
+        var current_constraints = init_current_constraints(constraints);
         var alphabet = generate_alphabet(current_constraints);
         var next_char = getNextChar(alphabet);
         var char_type;
@@ -204,7 +198,7 @@
             next_char = getNextChar(alphabet);
         }
 
-        if(validate(password, rules)) {
+        if(validate(password, constraints)) {
             callback(password);
         } else {
             // This should only happen for very small values of `size`.
@@ -212,24 +206,24 @@
         }
     }
 
-    function init_current_constraints(rules) {
+    function init_current_constraints(constraints) {
         var current_constraints = {};
-        for(var r in rules){
-            if(rules.hasOwnProperty(r)) {
-                current_constraints[r] = rules[r];
+        for(var r in constraints){
+            if(constraints.hasOwnProperty(r)) {
+                current_constraints[r] = constraints[r];
                 current_constraints[r].count = 0;
             }
         }
 
         return current_constraints;
     }
-    // Create an alphabet string based on the current rules
-    function generate_alphabet(rules) {
+    // Create an alphabet string based on the current constraints
+    function generate_alphabet(constraints) {
         var r,
             alphabet = '';
-        for(r in rules) {
-            if(rules.hasOwnProperty(r)) {
-                alphabet += rules[r].alphabet;
+        for(r in constraints) {
+            if(constraints.hasOwnProperty(r)) {
+                alphabet += constraints[r].alphabet;
             }
         }
         return alphabet;
