@@ -184,42 +184,22 @@
         }
 
         var password = '';
-        var metadata = {};
-        // A shallow copy is fine
-        for(var r in rules){
-            if(rules.hasOwnProperty(r)) {
-                metadata[r] = rules[r];
-            }
-        }
-
-        var min_size = 0;
-        // Do some preprocessing in order to generate alphabet properly
-        for(var k in metadata) {
-            if(metadata.hasOwnProperty(k)) {
-                var md = metadata[k];
-                metadata[k].count = 0;
-                if(md.max < md.min) {
-                    min_size += bytes.length;
-                } else {
-                    min_size += md.max;
-                }
-            }
-        }
-        var alphabet = generate_alphabet(metadata);
+        var current_constraints = init_current_constraints(rules);
+        var alphabet = generate_alphabet(current_constraints);
         var next_char = getNextChar(alphabet);
         var char_type;
 
         while(next_char) {
-            char_type = charType(next_char, metadata);
+            char_type = charType(next_char, current_constraints);
             password += next_char;
-            metadata[char_type].count += 1;
+            current_constraints[char_type].count += 1;
 
             // Regenerate alphabet if necessary
-            var typeMetadata = metadata[char_type];
+            var typeMetadata = current_constraints[char_type];
             if(typeMetadata.max >= typeMetadata.min &&
                typeMetadata.count >= typeMetadata.max) {
-                delete metadata[char_type];
-                alphabet = generate_alphabet(metadata);
+                delete current_constraints[char_type];
+                alphabet = generate_alphabet(current_constraints);
             }
             next_char = getNextChar(alphabet);
         }
@@ -233,7 +213,16 @@
     }
 
     function init_current_constraints(rules) {
+        var current_constraints = {};
+        // A shallow copy is fine
+        for(var r in rules){
+            if(rules.hasOwnProperty(r)) {
+                current_constraints[r] = rules[r];
+                current_constraints[r].count = 0;
+            }
+        }
 
+        return current_constraints;
     }
     // Create an alphabet string based on the current rules
     function generate_alphabet(rules) {
