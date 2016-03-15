@@ -195,9 +195,9 @@
             current_constraints[char_type].count += 1;
 
             // Regenerate alphabet if necessary
-            var typeMetadata = current_constraints[char_type];
-            if(typeMetadata.max >= typeMetadata.min &&
-               typeMetadata.count >= typeMetadata.max) {
+            var constraint = current_constraints[char_type];
+            if(constraint.max >= constraint.min &&
+               constraint.count >= constraint.max) {
                 delete current_constraints[char_type];
                 alphabet = generate_alphabet(current_constraints);
             }
@@ -214,7 +214,6 @@
 
     function init_current_constraints(rules) {
         var current_constraints = {};
-        // A shallow copy is fine
         for(var r in rules){
             if(rules.hasOwnProperty(r)) {
                 current_constraints[r] = rules[r];
