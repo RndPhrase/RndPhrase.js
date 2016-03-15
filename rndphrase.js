@@ -19,7 +19,7 @@
     function str2ab(str) {
         var buf = new ArrayBuffer(str.length);
         var bufView = new Uint8Array(buf);
-        for (var i=0; i < str.length; i += 1) {
+        for (var i = 0; i < str.length; i += 1) {
             bufView[i] = str.charCodeAt(i);
         }
         return buf;
@@ -47,13 +47,15 @@
         }
     }
 
-    function dprng_func(password, salt, rounds, size, callback) {
+    function dprng_function(password, salt, rounds, size, callback) {
         if (typeof exports === 'object') {
             var crypto = require('crypto');
 
-            crypto.pbkdf2(password, salt, rounds, size, function(err, key) {
-                callback(new Uint8Array(key));
-            });
+            crypto.pbkdf2(password, salt, rounds, size,
+                function(err, key) {
+                    callback(new Uint8Array(key));
+                }
+            );
         } else {
             window.crypto.subtle.importKey(
                 'raw',
@@ -80,15 +82,13 @@
     // Create an alphabet string based on the current rules
     function generate_alphabet(rules) {
         var r,
-            alpha = '';
-
+            alphabet = '';
         for(r in rules) {
             if(rules.hasOwnProperty(r)) {
-                alpha += rules[r].alphabet;
+                alphabet += rules[r].alphabet;
             }
         }
-
-        return alpha;
+        return alphabet;
     }
 
     // Create the actual password from a given hash
@@ -102,7 +102,7 @@
                 bytes = bytes.slice(1);
             } while(dprn >= maxPrnVal - (maxPrnVal % divisor));
 
-            if (isNaN(dprn)) {
+            if(isNaN(dprn)) {
                 return undefined;
             }
 
@@ -111,6 +111,7 @@
 
         var password = '';
         var metadata = {};
+        // A shallow copy is fine
         for(var r in rules){
             if(rules.hasOwnProperty(r)) {
                 metadata[r] = rules[r];
@@ -133,11 +134,11 @@
         var alphabet = generate_alphabet(metadata);
         var divisor = alphabet.length;
 
-        var nextChar = getNextChar(alphabet);
+        var next_char = getNextChar(alphabet);
         var char_type;
-        while(nextChar) {
-            char_type = charType(nextChar, metadata);
-            password += nextChar;
+        while(next_char) {
+            char_type = charType(next_char, metadata);
+            password += next_char;
             metadata[char_type].count += 1;
 
             // Regenerate alphabet if necessary
@@ -148,7 +149,7 @@
                 alphabet = generate_alphabet(metadata);
                 divisor = alphabet.length;
             }
-            nextChar = getNextChar(alphabet);
+            next_char = getNextChar(alphabet);
         }
 
         if(validate(password, rules)) {
@@ -184,7 +185,7 @@
         }
 
         // Generate byte array with deterministic pseudo random numbers
-        self.dprng_func = config.dprng_func || dprng_func;
+        self.dprng_function = config.dprng_function || dprng_function;
 
         // Validate a password against rules
         self.validate = config.validate || function(h, rules) {
@@ -225,7 +226,7 @@
                     ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
             };
 
-            self.dprng_func(
+            self.dprng_function(
                 (password || self.password),
                 self.seed + '$' + self.uri,
                 self.version,
