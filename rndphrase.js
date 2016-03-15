@@ -1,18 +1,30 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['cubehash'], factory);
+        define(factory);
     } else if (typeof exports === 'object') {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like enviroments that support module.exports,
         // like Node.
-        module.exports = factory(require('cubehash.js'));
+        //
+        module.exports = factory();
     } else {
-        // Browser globals (root is window)
-        root.rndphrase = factory(root.cubehash);
+        root.rndphrase = factory();
     }
-}(this, function (hmac) {
+}(this, function () {
     // Private module methods
+
+    // Adapted from https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+    // Be warned, this assumes utf-8 input
+    function str2ab(str) {
+        var buf = new ArrayBuffer(str.length);
+        var bufView = new Uint8Array(buf);
+        for (var i=0; i < str.length; i += 1) {
+            bufView[i] = str.charCodeAt(i);
+        }
+        return buf;
+    }
+
     function charIs(c) {
         if(is_capital(c)) {
             return 'capital';
@@ -24,7 +36,7 @@
             return 'special';
         } else {
             //non-ascii char
-            throw new Error("Illegal character: " + c);
+            throw new Error('Illegal character: ' + c);
         }
     }
 
@@ -51,247 +63,214 @@
                 (cc > 122 && cc < 127));
     }
 
-    // The RndPhrase object being exported
-    function RndPhrase(config) {
-        var self = this,
-            host,
-            seed,
-            doc;
+    function setup_rule(rule, alphabet){
+        if (rule !== false){
+            var cfg = rule || {};
+            return {
+                'min': cfg.min || 1,
+                'max': cfg.max || 0,
+                'alphabet': cfg.alphabet || alphabet
+            };
+        }
+    }
 
-        config = config || {};
+    function dprng_func(password, salt, rounds, size, callback) {
+        if (typeof exports === 'object') {
+            var crypto = require('crypto');
 
-        self.hash = function(seed, data) {
-            return hmac(seed + data)
+            crypto.pbkdf2(password, salt, rounds, size, function(err, key) {
+                callback(new Uint8Array(key));
+            });
+        } else {
+            window.crypto.subtle.importKey(
+                'raw',
+                str2ab(password),
+                {'name': 'PBKDF2'},
+                false,
+                ['deriveBits']).then(function(key) {
+                    window.crypto.subtle.deriveBits(
+                    {
+                        'name': 'PBKDF2',
+                        'salt': str2ab(salt),
+                        iterations: rounds,
+                        'hash': {'name': 'SHA-1'}
+                    },
+                    key,
+                    size*8
+                ).then(function(bits) {
+                    callback(new Uint8Array(bits));
+                });
+            });
+        }
+    }
+
+    // Create an alphabet string based on the current rules
+    function generate_alphabet(rules) {
+        var r,
+            alpha = '';
+        for(r in rules) {
+            if(rules.hasOwnProperty(r)) {
+                alpha += rules[r].alphabet;
+            }
         }
 
+        //this requires Javascript 1.6
+        return alpha.split('').filter(function(v, i, s) {
+            var is_char = (is_capital(v) ||
+                       is_minuscule(v) ||
+                       is_numeric(v) ||
+                       is_special(v));
+            return s.indexOf(v) === i && is_char;
+        }).sort();
+    }
+
+    // Create the actual password from a given hash
+    function generate_password(bytes, rules, validate, callback) {
+        function getNextChar(alphabet) {
+            var dprn,
+                divisor = alphabet.length,
+                maxPrnVal = Math.pow(16);
+            do {
+                dprn = bytes[0];
+                bytes = bytes.slice(1);
+            } while(dprn >= maxPrnVal - (maxPrnVal % divisor));
+
+            if (isNaN(dprn)) {
+                return undefined;
+            }
+
+            return alphabet[dprn % divisor];
+        }
+
+        var password = '';
+        var metadata = rules;
+        var min_size = 0;
+
+        // Do some preprocessing in order to generate alphabet properly
+        for(var k in metadata) {
+            if(metadata.hasOwnProperty(k)) {
+                var md = metadata[k];
+                metadata[k].count = 0;
+                if(md.max < md.min) {
+                    min_size += bytes.length;
+                } else {
+                    min_size += md.max;
+                }
+            }
+        }
+        var alphabet = generate_alphabet(metadata);
+        var divisor = alphabet.length;
+
+        var nextChar = getNextChar(alphabet);
+        var charType;
+        while(nextChar) {
+            charType = charIs(nextChar);
+            password += nextChar;
+            metadata[charType].count += 1;
+
+            // Regenerate alphabet if necessary
+            var typeMetadata = metadata[charType];
+            if(typeMetadata.max >= typeMetadata.min &&
+               typeMetadata.count >= typeMetadata.max) {
+                delete metadata[charType];
+                alphabet = generate_alphabet(metadata);
+                divisor = alphabet.length;
+            }
+            nextChar = getNextChar(alphabet);
+        }
+
+        if(validate(password, rules)) {
+            callback(password);
+        } else {
+            // This should only happen for very small values of `size`.
+            throw new Error('Unable to generate valid password.');
+        }
+    }
+
+    // The RndPhrase object being exported
+    function RndPhrase(config) {
+        var self = this;
+
+        config = config || {};
         self.seed = config.seed || '';
-
         self.uri = config.uri;
+        self.password = config.password || '';
 
-        self.passwd = config.password || '';
+        self.capital = config.capital;
+        self.minuscule = config.minuscule;
+        self.numeric = config.numeric;
+        self.special = config.special;
 
         self.version = parseInt(config.version);
-
         if(isNaN(self.version) || self.version < 0) {
             self.version = 1;
         }
 
         self.size = parseInt(config.size);
         if(isNaN(self.size)) {
-            self.size = 16;
+            self.size = 32;
         }
 
-        self.rules = {};
-
-        // Configure capital letters
-        self.capital = config.capital;
-        if(config.capital !== false) {
-            var alpha = '';
-            var cfg = config.capital || {};
-
-            for(var cc = 65; cc < 91; cc++) {
-                alpha += String.fromCharCode(cc);
-            }
-
-            self.rules.capital = {
-                'min': cfg.min || 1,
-                'max': cfg.max || 0,
-                'alphabet': cfg.alphabet || alpha
-            };
-        }
-
-        // Configure minuscule letters
-        self.minuscule = config.minuscule;
-        if(self.minuscule !== false) {
-            var alpha = '';
-            var cfg = config.minuscule || {};
-            for(var cc = 97; cc < 123; cc++) {
-                alpha += String.fromCharCode(cc);
-            }
-
-            self.rules.minuscule = {
-                'min': cfg.min || 1,
-                'max': cfg.max || 0,
-                'alphabet': cfg.alphabet || alpha
-            };
-        }
-
-        // Configure numeric characters
-        self.numeric = config.numeric;
-        if(self.numeric !== false) {
-            var alpha = '';
-            var cfg = config.numeric || {};
-            for(var cc = 48; cc < 58; cc++) {
-                alpha += String.fromCharCode(cc);
-            }
-            self.rules.numeric = {
-                'min': cfg.min || 1,
-                'max': cfg.max || 0,
-                'alphabet': cfg.alphabet || alpha
-            };
-        }
-
-        // Configure special characters
-        self.special = config.special;
-        if(self.special !== false) {
-            var cc = 32;
-            var alpha = '';
-            var cfg = config.special || {};
-            while(cc < 127) {
-                if(cc < 48 || (cc > 57 && cc < 65) ||
-                   (cc > 90 && cc < 97) || cc > 122) {
-                    alpha += String.fromCharCode(cc);
-                }
-                cc++;
-            }
-            self.rules.special = {
-                'min': cfg.min || 1,
-                'max': cfg.max || 0,
-                'alphabet': cfg.alphabet || alpha
-            };
-        }
+        // Generate byte array with deterministic pseudo random numbers
+        self.dprng_func = config.dprng_func || dprng_func;
 
         // Validate a password against rules
-        self.validate = config.validate || function validate(h, rules, size) {
-            for(var r in rules) {
-                var rule = rules[r];
-                if(rule.count < rule.min) return false;
+        self.validate = config.validate || function(h, rules) {
+            var i, charType;
+            var count = {};
+
+            for(i in rules) {
+                if(rules.hasOwnProperty(i)) {
+                    count[i] = 0;
+                }
             }
-            return h.length >= size;
+
+            for(i = 0; i < h.length; i += 1) {
+                charType = charIs(h.charAt(i));
+                count[charType] += 1;
+            }
+
+            for(i in rules) {
+                if(count[i] < rules[i].min) {
+                    return false;
+                }
+            }
+            return true;
         };
 
-        self.alphabet = config.alphabet;
+        self.generate = function(password, callback) {
+            var rules = {
+                'capital': setup_rule(
+                    self.capital,
+                    'ABCDEFGHIJKLMONPQRSTUVWXYZ'),
+                'minuscule': setup_rule(
+                    self.minuscule,
+                    'abcdefghijklmnopqrstuvwxyz'),
+                'numeric': setup_rule(
+                    self.numeric,
+                    '0123456789'),
+                'special': setup_rule(
+                    self.special,
+                    ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
+            };
 
-        // Create an alphabet string based on the current rules
-        self.generate_alphabet = function(rules) {
-            var alpha = ''
-            if(self.alphabet) {
-                alpha = self.alphabet;
-            } else {
-                for(var r in rules) {
-                    alpha += rules[r].alphabet
+            self.dprng_func(
+                (password || self.password),
+                self.seed + '$' + self.uri,
+                self.version,
+                self.size,
+                function(key) {
+                    generate_password(
+                        key,
+                        rules,
+                        self.validate,
+                        function(rndphrase) {
+                            callback(rndphrase);
+                        });
                 }
-            }
-
-            //this requires Javascript 1.6
-            return alpha.split('').filter(function(v, i, s) {
-                is_char = (is_capital(v) ||
-                           is_minuscule(v) ||
-                           is_numeric(v) ||
-                           is_special(v));
-                return s.indexOf(v) === i && is_char;
-            }).sort();
-        }
-
-        // Create the actual password from a given hash
-        self.pack = function(prnString) {
-            function getNextChar(alphabet, size) {
-                var divisor = alphabet.length;
-                var maxPrnVal = Math.pow(16, prnSize);
-
-                do {
-                    var hexa = prnString.substring(0, size)
-                    var n = parseInt(hexa, 16);
-                    prnString = prnString.substring(size);
-                } while(n >= maxPrnVal - (maxPrnVal % divisor));
-
-                if (isNaN(n)) {
-                    throw new Error("Not enough entropy.");
-                }
-
-                return alphabet[n % divisor];
-            }
-
-            var passwordCandidate = '';
-            var metadata = self.rules;
-            var min_size = 0;
-
-            // Do some preprocessing in order to generate alphabet properly
-            for(var k in metadata) {
-                var md = metadata[k];
-                metadata[k].count = 0;
-                if(md.max < md.min) {
-                    min_size += self.size;
-                } else {
-                    min_size += md.max;
-                }
-            }
-            var alphabet = self.generate_alphabet(metadata);
-            var divisor = alphabet.length;
-
-            //How large should the ints be?
-            //Put here so we always pick the same size consistently
-            var prnSize = 0;
-            // Figure out the number of bytes to use for the pseudo
-            // random number. Range of prnString is 16.
-            while(Math.pow(16, prnSize) < divisor) prnSize++;
-
-            while(
-                !self.validate(
-                    passwordCandidate,
-                    metadata,
-                    Math.min(min_size, self.size))
-            ) {
-                var nextChar;
-                var charType;
-
-                nextChar = getNextChar(alphabet, prnSize);
-                charType = charIs(nextChar);
-
-                // Regenerate alphabet if necessary
-                var typeMetadata = metadata[charType]
-                if(typeMetadata.max >= typeMetadata.min &&
-                   typeMetadata.count >= typeMetadata.max) {
-                    delete metadata[charType];
-                    alphabet = self.generate_alphabet(metadata);
-                    divisor = alphabet.length;
-                    prnSize = 0;
-                    for(; Math.pow(16, prnSize) < divisor; prnSize++);
-                    continue;
-                }
-
-                passwordCandidate += nextChar;
-                metadata[charType].count++;
-            }
-            return passwordCandidate;
-        }
-
-        self.generator = function (passwd) {
-            // produce secure hash from seed, password and host
-            return function() {
-                self.passwd = self.pack(
-                    self.hash(
-                        self.hash(
-                            self.hash(
-                                self.hash(self.passwd, '$' + self.uri),
-                                self.seed),
-                            self.passwd),
-                        self.version)
-                    );
-                return self.passwd;
-            }
-        }
-
-        self.generate = function(password) {
-            if(password) {
-                self.state = self.generator(password)
-            } else if(self.state === undefined) {
-                if (undefined === config.uri) {
-                    throw new Error('RndPhrase: Missing hostname in configuration');
-                }
-                self.state = self.generator(self.passwd);
-            }
-
-            return self.state();
-        }
+            );
+        };
     }
-
-    RndPhrase.prototype = {
-        // This will be overwritten by constructor
-        generator: function () {
-            throw new Error('RndPhrase: No generator installed');
-        }
-    };
 
     return RndPhrase;
 }));
