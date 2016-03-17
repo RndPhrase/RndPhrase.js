@@ -21,19 +21,19 @@
         self.uri = config.uri;
         self.password = config.password || '';
         self.constraints = config.constraints || {
-            'capital': setup_constraint(
+            'capital': initConstraint(
                 config.capital,
                 'ABCDEFGHIJKLMONPQRSTUVWXYZ'),
-            'minuscule': setup_constraint(
+            'minuscule': initConstraint(
                 config.minuscule,
                 'abcdefghijklmnopqrstuvwxyz'),
-            'numeric': setup_constraint(
+            'numeric': initConstraint(
                 config.numeric,
                 '0123456789'),
-            'special': setup_constraint(
+            'special': initConstraint(
                 config.special,
                 ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
-        }
+        };
 
         self.version = parseInt(config.version);
         if(isNaN(self.version) || self.version < 0) {
@@ -46,13 +46,13 @@
         }
 
         // Generate byte array with deterministic pseudo random numbers
-        self.dprng_function = config.dprng_function || dprng_function;
+        self.dprngFunction = config.dprngFunction || dprngFunction;
 
         // Validate a password against constraints
         self.validate = config.validate || validate;
 
         self.generate = function(password, callback) {
-            self.dprng_function(
+            self.dprngFunction(
                 (password || self.password),
                 self.seed + '$' + self.uri,
                 self.version,
@@ -71,7 +71,7 @@
     }
 
     // Private module methods
-    function dprng_function(password, salt, rounds, size, callback) {
+    function dprngFunction(password, salt, rounds, size, callback) {
         if (typeof exports === 'object') {
             var crypto = require('crypto');
 
@@ -134,7 +134,7 @@
             }
         }
         return true;
-    };
+    }
 
     function charType(c, constraints) {
         var r;
@@ -147,7 +147,7 @@
         }
     }
 
-    function setup_constraint(constraint, alphabet){
+    function initConstraint(constraint, alphabet){
         if (constraint !== false){
             var cfg = constraint || {};
             return {
@@ -178,8 +178,8 @@
         }
 
         var password = '';
-        var current_constraints = init_current_constraints(constraints);
-        var alphabet = generate_alphabet(current_constraints);
+        var current_constraints = initCurrentConstraints(constraints);
+        var alphabet = generateAlphabet(current_constraints);
         var next_char = getNextChar(alphabet);
         var char_type;
 
@@ -193,7 +193,7 @@
             if(constraint.max >= constraint.min &&
                constraint.count >= constraint.max) {
                 delete current_constraints[char_type];
-                alphabet = generate_alphabet(current_constraints);
+                alphabet = generateAlphabet(current_constraints);
             }
             next_char = getNextChar(alphabet);
         }
@@ -206,7 +206,7 @@
         }
     }
 
-    function init_current_constraints(constraints) {
+    function initCurrentConstraints(constraints) {
         var current_constraints = {};
         for(var r in constraints){
             if(constraints.hasOwnProperty(r)) {
@@ -218,7 +218,7 @@
         return current_constraints;
     }
     // Create an alphabet string based on the current constraints
-    function generate_alphabet(constraints) {
+    function generateAlphabet(constraints) {
         var r,
             alphabet = '';
         for(r in constraints) {
