@@ -21,7 +21,6 @@
 
     // The RndPhrase object being exported
     function RndPhrase(config) {
-        //console.log(config);
         var self = this;
         config = config || {};
         self.seed = config.seed || '';
@@ -79,7 +78,8 @@
                         self.validate,
                         function(rndphrase) {
                             callback(rndphrase);
-                        });
+                        }
+                    );
                 }
             );
         };
