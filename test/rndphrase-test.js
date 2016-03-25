@@ -23,15 +23,9 @@ describe('RndPhrase', function () {
 
     describe('Behaviour:', function() {
         it('Should hash deterministically', function (done) {
-            var r1 = new RndPhrase({
-                seed: 'foo',
-                uri: 'example.net',
-            });
+            var r1 = new RndPhrase();
 
-            var r2 = new RndPhrase({
-                seed: 'foo',
-                uri: 'example.net',
-            });
+            var r2 = new RndPhrase();
 
             r1.generatePassword('bar', function(p1) {
                 r2.generatePassword('bar', function(p2) {
@@ -43,17 +37,12 @@ describe('RndPhrase', function () {
 
         it('Should be different versions', function(done) {
             var r1 = new RndPhrase({
-                seed: 'foo',
-                uri: 'example.net',
                 version: 1
             });
 
             var r2 = new RndPhrase({
-                seed: 'foo',
-                uri: 'example.net',
                 version: 2
             });
-
 
             r1.generatePassword('bar', function(p1) {
                 r2.generatePassword('bar', function(p2) {
@@ -64,11 +53,9 @@ describe('RndPhrase', function () {
         });
         it('Should hash with whole uri value', function(done) {
             var r1 = new RndPhrase({
-                'seed': 'foo',
                 'uri': 'example.net'
             });
             var r2 = new RndPhrase({
-                'seed': 'foo',
                 'uri': 'example.net/path'
             });
 
@@ -173,44 +160,41 @@ describe('RndPhrase', function () {
             });
         });
 
-        it('dprngFunction() should be overwritable from config', function(done) {
-            function dprngFunction(password, salt, rounds, size, callback) {
-                callback([0,1,2,3]);
-            }
-            var config = {
-                'seed': 'foo',
-                'uri': 'example.net',
-                'dprngFunction': dprngFunction
-            };
-            var expect_password = '';
-            for(var type in types) {
-                if(types.hasOwnProperty(type)) {
-                    var c = types[type][0];
-                    config[type] = {
-                        'min': 1,
-                        'max': 0,
-                        'alphabet': c
-                    };
-                    expect_password += c;
+        it(
+            'dprngFunction() should be overwritable from config',
+            function(done) {
+                function dprngFunction(password, salt, rounds, size,
+                        callback) {
+                    callback([0,1,2,3]);
                 }
-            }
-            var r1 = new RndPhrase(config);
+                var config = {'dprngFunction': dprngFunction};
+                var expect_password = '';
+                for(var type in types) {
+                    if(types.hasOwnProperty(type)) {
+                        var c = types[type][0];
+                        config[type] = {
+                            'min': 1,
+                            'max': 0,
+                            'alphabet': c
+                        };
+                        expect_password += c;
+                    }
+                }
+                var r1 = new RndPhrase(config);
 
-            r1.generatePassword('bar', function(p1) {
-                assert.equal(p1, expect_password);
-                done();
-            });
-        });
+                r1.generatePassword('bar', function(p1) {
+                    assert.equal(p1, expect_password);
+                    done();
+                });
+            }
+        );
 
         change_tests.forEach(function(test) {
             it(
                 'Key: ' + test.key +
                 ' should be overwritable for type: ' + test.type,
                 function(done) {
-                    var config = {
-                        'seed': 'foo',
-                        'uri': 'example.net'
-                    };
+                    var config = {};
                     config[test.type] = {};
                     config[test.type][test.key] = test.value;
 
@@ -234,23 +218,24 @@ describe('RndPhrase', function () {
         });
 
         deactivate_tests.forEach(function(test) {
-            it('Should let type:' + test.type + ' be deactivated', function(done) {
-                var config = {
-                    'seed': 'foo',
-                    'uri': 'example.net'
-                };
-                config[test.type] = false;
+            it(
+                'Should let type:' + test.type + ' be deactivated',
+                function(done) {
+                    var config = {};
+                    config[test.type] = false;
 
-                var r1 = new RndPhrase(config);
-                r1.generatePassword('bar', function(p1) {
-                    var actual_count = charTypeCount(test.alphabet, p1);
-                    assert.equal(
-                        actual_count,
-                        0,
-                        'Count: ' + actual_count + ' of type: ' + test.type);
-                    done();
-                });
-            });
+                    var r1 = new RndPhrase(config);
+                    r1.generatePassword('bar', function(p1) {
+                        var actual_count = charTypeCount(test.alphabet, p1);
+                        assert.equal(
+                            actual_count,
+                            0,
+                            'Count: ' + actual_count +
+                            ' of type: ' + test.type);
+                        done();
+                    });
+                }
+            );
         });
     });
 
@@ -258,61 +243,61 @@ describe('RndPhrase', function () {
         Object.keys(types).forEach(function(type) {
             var type_elements = types[type];
 
-            it('Type: ' + type + ' should adhere to minimum constraints', function(done) {
-                var r1 = new RndPhrase({
-                    'seed': 'foo',
-                    'uri': 'example.net',
-                });
-                r1.generatePassword('bar', function(p1) {
-                    var actual_count = charTypeCount(type_elements, p1);
-                    var expect_minimum = actual_count + 1;
-                    var config = {
-                        'seed': 'foo',
-                        'uri': 'example.net',
-                     };
-                    config[type] = {
-                            'min': expect_minimum,
-                    };
-                    var r2 = new RndPhrase(config);
+            it(
+                'Type: ' + type + ' should adhere to minimum constraints',
+                function(done) {
+                    var r1 = new RndPhrase();
+                    r1.generatePassword('bar', function(p1) {
+                        var actual_count = charTypeCount(type_elements, p1);
+                        var expect_minimum = actual_count + 1;
+                        var config = {};
+                        config[type] = {
+                                'min': expect_minimum,
+                        };
+                        var r2 = new RndPhrase(config);
 
-                    r2.generatePassword('bar', function(p2) {
-                        var actual_count = charTypeCount(type_elements, p2);
-                        assert.ok(
-                            actual_count >= expect_minimum,
-                            'Minimum count: ' + actual_count + ' less than: ' +
-                            expect_minimum + ' for: ' + p2);
-                        done();
-                    });
-                });
+                        r2.generatePassword('bar', function(p2) {
+                            var actual_count = charTypeCount(
+                                type_elements,
+                                p2);
+                            assert.ok(
+                                actual_count >= expect_minimum,
+                                'Minimum count: ' + actual_count +
+                                ' less than: ' + expect_minimum +
+                                ' for: ' + p2);
+                            done();
+                        });
+                    }
+                );
             });
 
-            it('Type: ' + type + ' should adhere to maximum constraints', function(done) {
-                var r1 = new RndPhrase({
-                    'seed': 'foo',
-                    'uri': 'example.net',
-                });
-                r1.generatePassword('bar', function(p1){
-                    var actual_count = charTypeCount(type_elements, p1);
-                    var expect_maximum = actual_count - 1;
-                    var config = {
-                        'seed': 'foo',
-                        'uri': 'example.net',
-                    };
-                    config[type] = {
-                        'max': expect_maximum
-                    };
+            it(
+                'Type: ' + type + ' should adhere to maximum constraints',
+                function(done) {
+                    var r1 = new RndPhrase();
+                    r1.generatePassword('bar', function(p1){
+                        var actual_count = charTypeCount(type_elements, p1);
+                        var expect_maximum = actual_count - 1;
+                        var config = {};
+                        config[type] = {
+                            'max': expect_maximum
+                        };
 
-                    var r2 = new RndPhrase(config);
-                    r2.generatePassword('bar', function(p2) {
-                        var actual_count = charTypeCount(type_elements, p2);
-                        assert.ok(
-                            actual_count <= expect_maximum,
-                            'Maximum count: ' + actual_count + ' larger than: ' +
-                            expect_maximum + ' for: ' + p2);
-                        done();
+                        var r2 = new RndPhrase(config);
+                        r2.generatePassword('bar', function(p2) {
+                            var actual_count = charTypeCount(
+                                type_elements,
+                                p2);
+                            assert.ok(
+                                actual_count <= expect_maximum,
+                                'Maximum count: ' + actual_count +
+                                ' larger than: ' + expect_maximum +
+                                ' for: ' + p2);
+                            done();
+                        });
                     });
-                });
-            });
+                }
+            );
         });
     });
 });
