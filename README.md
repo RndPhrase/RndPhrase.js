@@ -1,5 +1,4 @@
 # RndPhrase.js
-
 [![Build Status](https://travis-ci.org/RndPhrase/RndPhrase.js.svg?branch=master)](https://travis-ci.org/RndPhrase/RndPhrase.js)
 
 RndPhrase.js is a library to generate passwords deterministically
@@ -15,7 +14,7 @@ from a predefined alphabet of characters of which the final password
 ## Usage
 Import RndPhrase.js as a module in your source.
 
-    RndPhrase = require('rndphrase.js');
+    var RndPhrase = require('rndphrase.js');
 
 Instantiate the object with the minimum configuration requirements
 
@@ -29,43 +28,39 @@ Invoke the generatePassword method
     // W4,CV!lGox;rA=NL`>pudUTy+_iW3/P:
 
 
-## Configuration
+## Configuration Options
 Configuration items are passed as a plain javascript object. Available configuration options:
 
+### Parameters
 #### seed
 The seed used. Expected to be a string, but can be everything that can be hashed by the hashing algorithm. Should be entered manually once and saved by the plugin using the library. Remember not to save in plaintext. ;)
-
-Mandatory, does not have a default.
 
 #### uri
 A string specifying the location, should be generated automatically by the plugin using the library.
 
-Mandatory, does not have a default.
-
 #### password
 The password entered by the user. Should be entered manually, do not save this anywhere.
 
-Mandatory, does not have a default.
-
 #### size
-An integer specifying the smallest possible size of the hashed password.
+Specify how many bits the pseudo random number generator will
+output to generate a password. The final password is usually
+almost as large.
 
-Defaults to 16.
+Defaults to 42.
 
 #### version
-Integer. Used for stupid websites that demand you change passwords frequently.
+Generates a new password with the same credentials.
 
 Defaults to 1.
 
-
-### Constraints
+#### Constraints
 A constraint is a javascript object with dict with this structure:
 
-   {
+    {
        'min': non-negative-int,
        'max': non-negative-int,
        'alphabet': string
-   }
+    }
 
 When `max < min`, `max` is ignored.
 
@@ -78,13 +73,14 @@ The default constraints will be loaded into a `constraints` variable
 upon initialisation. Active constraints (keys that are not `false`)
 in this variable will be used on every call to `generatePassword()`.
 
-#### Add Manually Defined Character Types
+##### Add Manually Defined Character Types
 It is possible to add new character types, this is done by configuring
 `constraints` directly when instantiating the RndPhrase object.
 
 When `constraints` is used as a configuration parameter one must
 declare all constraints manually. The default constraints object
 looks like this:
+
     {
         capital: {
             min: 1,
@@ -109,11 +105,18 @@ looks like this:
     }
 
 
+### Methods
+#### dprngFunction
+#### validate
+
+
 ## Support
 Any questions? Please ask them in #rndphrase on irc.freenode.net
 
+
 ## License
 MIT
+
 
 ## Donate
 Help making this software better
