@@ -107,7 +107,34 @@ looks like this:
 
 ### Methods
 #### dprngFunction
+Overwrite this function to supply another hashing algorithm than
+the default (PBKDF2). `dprngFunction` takes five arguments `password`, `salt`, `rounds`, `size`, `callback`.
+
+##### password
+The raw password.
+
+##### salt
+The salt is a concatenation of the master seed, a `$` (for historical reasons) and the uri.
+
+##### rounds
+How many iterations of the hash to perform. This is `version*100`.
+
+##### size
+The size of the array of numbers to call `callback` with
+
+##### callback
+This is an anonymous function which takes a single argument (a
+byte array) and invokes the internal password generation function.
+
 #### validate
+Overwrite the normal password validation function which checks
+whether constraints are upheld. It takes two arguments `h`, `constraints`
+
+##### h
+The password candidate.
+
+##### constraints
+An object containing the defined constraints.
 
 
 ## Support
