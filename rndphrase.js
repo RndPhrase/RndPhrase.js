@@ -15,7 +15,7 @@
     var default_constraints = {
         'capital': 'ABCDEFGHIJKLMONPQRSTUVWXYZ',
         'minuscule': 'abcdefghijklmnopqrstuvwxyz',
-        'numeric': '1234567890',
+        'numeric': '0123456789',
         'special': ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
     };
 
