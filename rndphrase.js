@@ -41,8 +41,8 @@
         }
 
         self.version = parseInt(config.version);
-        if(isNaN(self.version) || self.version < 0) {
-            self.version = 0;
+        if(isNaN(self.version) || self.version < 1) {
+            self.version = 1;
         }
 
         self.size = parseInt(config.size);

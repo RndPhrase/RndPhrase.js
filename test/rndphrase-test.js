@@ -113,7 +113,7 @@ describe('RndPhrase', function () {
                 {'variable': 'uri', 'expect': ''},
                 {'variable': 'password', 'expect': ''},
                 {'variable': 'size', 'expect': 42},
-                {'variable': 'version', 'expect': 0},
+                {'variable': 'version', 'expect': 1},
 
             ];
             var r = new RndPhrase();
@@ -144,9 +144,10 @@ describe('RndPhrase', function () {
         });
 
         it('validate() should be overwritable from config', function(done) {
-            var i = 0;
+            var i = 1;
             var r1 = new RndPhrase({
                 'validate': function() {
+                    // Return true when password is 10th iteration
                     if(i < 10) {
                         i += 1;
                         return false;
@@ -274,7 +275,12 @@ describe('RndPhrase', function () {
             it(
                 'Type: ' + type + ' should adhere to maximum constraints',
                 function(done) {
-                    var r1 = new RndPhrase();
+                    var r1_config = {};
+                    r1_config[type] = {
+                        'min': 2
+                    };
+                    var r1 = new RndPhrase(r1_config);
+
                     r1.generatePassword('bar', function(p1){
                         var actual_count = charTypeCount(type_elements, p1);
                         var expect_maximum = actual_count - 1;
