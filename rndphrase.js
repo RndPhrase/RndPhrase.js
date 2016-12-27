@@ -65,7 +65,7 @@
                 pass = password || self.password;
             }
             iterations = self.version * 100 + 50000;
-            console.log("Doing " + iterations + " iterations.")
+
             self.password = pass;
 
             self.dprngFunction(
