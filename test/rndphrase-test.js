@@ -241,6 +241,7 @@ describe('RndPhrase', function () {
     });
 
     describe('Constraints:', function() {
+        this.timeout(0);
         Object.keys(types).forEach(function(type) {
             var type_elements = types[type];
 

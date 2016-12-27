@@ -57,18 +57,21 @@
         self.validate = config.validate || validate;
 
         self.generatePassword = function(password, callback) {
-            var pass;
+            var pass, iterations;
             if(typeof password === 'function' && callback === undefined) {
                 callback = password;
                 pass = self.password;
             } else {
                 pass = password || self.password;
             }
+            iterations = self.version * 100 + 50000;
+            console.log("Doing " + iterations + " iterations.")
             self.password = pass;
+
             self.dprngFunction(
                 self.password,
                 self.seed + '$' + self.uri,
-                self.version*100,
+                iterations,
                 self.size,
                 function(key) {
                     doGeneratePassword(
