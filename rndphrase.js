@@ -106,14 +106,14 @@
                     throw new Exception("No text-encoding module found");
                 }
             };
-
-            window.crypto.subtle.importKey(
+            var cryptoObj = window.crypto || window.msCrypto; // for IE 11
+            cryptoObj.subtle.importKey(
                 'raw',
                 str2ab(password),
                 {'name': 'PBKDF2'},
                 false,
                 ['deriveBits']).then(function(key) {
-                    window.crypto.subtle.deriveBits(
+                    cryptoObj.subtle.deriveBits(
                     {
                         'name': 'PBKDF2',
                         'salt': str2ab(salt_and_pepper),
