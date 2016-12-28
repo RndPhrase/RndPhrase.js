@@ -99,8 +99,6 @@
                     callback(new Uint8Array(key));
                 });
         } else {
-            // Adapted from https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-            // Be warned, this assumes utf-8 input
             var str2ab = function(str) {
                 if(TextEncoder) {
                     return new TextEncoder().encode(str);
