@@ -103,7 +103,7 @@
                 if(TextEncoder) {
                     return new TextEncoder().encode(str);
                 } else {
-                    throw new Exception("No text-encoding module found");
+                    throw new Error('No text-encoding module found');
                 }
             };
             var cryptoObj = window.crypto || window.msCrypto; // for IE 11
