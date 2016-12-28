@@ -101,12 +101,11 @@
             // Adapted from https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
             // Be warned, this assumes utf-8 input
             var str2ab = function(str) {
-                var buf = new ArrayBuffer(str.length);
-                var bufView = new Uint8Array(buf);
-                for (var i = 0; i < str.length; i += 1) {
-                    bufView[i] = str.charCodeAt(i);
+                if(TextEncoder) {
+                    return new TextEncoder().encode(str);
+                } else {
+                    throw new Exception("No text-encoding module found");
                 }
-                return buf;
             };
 
             window.crypto.subtle.importKey(
