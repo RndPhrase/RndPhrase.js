@@ -18,14 +18,14 @@ Import RndPhrase.js as a module in your source.
 
 Instantiate the object with the minimum configuration requirements
 
-    var r = RndPhrase();
+    var r = new RndPhrase();
 
 Invoke the generatePassword method
 
     r.generatePassword(function(password) {
         console.log(password);
     });
-    // W4,CV!lGox;rA=NL`>pudUTy+_iW3/P:
+    // &i#`hVeOIG<$_d0)nZ(FMh*v{LMTv)nL#`9X utL 0
 
 
 ## Configuration Options
@@ -33,13 +33,18 @@ Configuration items are passed as a plain javascript object. Available configura
 
 ### Parameters
 #### seed
-The seed used. Expected to be a string, but can be everything that can be hashed by the hashing algorithm. Should be entered manually once and saved by the plugin using the library. Remember not to save in plaintext. ;)
+The seed used. Expected to be a string, but can be everything that
+can be hashed by the hashing algorithm. Should be entered manually
+once and saved by the plugin using the library. Remember not to
+save in plaintext. ;)
 
 #### uri
-A string specifying the location, should be generated automatically by the plugin using the library.
+A string specifying the location, should be generated automatically
+by the plugin using the library.
 
 #### password
-The password entered by the user. Should be entered manually, do not save this anywhere.
+The password entered by the user. Should be entered manually, do
+not save this anywhere.
 
 #### size
 Specify how many bits the pseudo random number generator will
@@ -62,7 +67,7 @@ A constraint is a javascript object with dict with this structure:
        'alphabet': string
     }
 
-When `max < min`, `max` is ignored.
+When `max < min`, `max` is ignored. When `max` is `0` it is disabled.
 
 There are four default constraints (or *character types*): `capital`,
 `minuscule`, `numeric`, and `special`. Each of which can be deactivated
@@ -108,16 +113,20 @@ looks like this:
 ### Methods
 #### dprngFunction
 Overwrite this function to supply another hashing algorithm than
-the default (PBKDF2). `dprngFunction` takes five arguments `password`, `salt`, `rounds`, `size`, `callback`.
+the default (PBKDF2). `dprngFunction` takes five arguments `password`,
+`salt`, `rounds`, `size`, `callback`.
 
 ##### password
 The raw password.
 
 ##### salt
-The salt is a concatenation of the master seed, a `$` (for historical reasons) and the uri.
+The salt is a concatenation of the master seed, the uri and a
+pepper (to ensure minmal entropy).
 
 ##### rounds
-How many iterations of the hash to perform. This is `version*100`.
+How many iterations of the hash to perform. Number is multiplied
+with 100 and
+added with 50.000.
 
 ##### size
 The size of the array of numbers to call `callback` with
@@ -138,14 +147,8 @@ An object containing the defined constraints.
 
 
 ## Support
-Any questions? Please ask them in #rndphrase on irc.freenode.net
+Any questions? Please ask them in #rndphrase on irc.freenode.net.
 
 
 ## License
 MIT
-
-
-## Donate
-Help making this software better
-
-BTC: 1NPnXF6bUBx9GJCnHkWNN5hpNQQAbWnpPP
