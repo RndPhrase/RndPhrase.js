@@ -15,7 +15,7 @@
     var default_constraints = {
         'capital': 'ABCDEFGHIJKLMONPQRSTUVWXYZ',
         'minuscule': 'abcdefghijklmnopqrstuvwxyz',
-        'numeric': '1234567890',
+        'numeric': '0123456789',
         'special': ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
     };
 
@@ -41,8 +41,8 @@
         }
 
         self.version = parseInt(config.version);
-        if(isNaN(self.version) || self.version < 0) {
-            self.version = 0;
+        if(isNaN(self.version) || self.version < 1) {
+            self.version = 1;
         }
 
         self.size = parseInt(config.size);
@@ -57,18 +57,21 @@
         self.validate = config.validate || validate;
 
         self.generatePassword = function(password, callback) {
-            var pass;
+            var pass, iterations;
             if(typeof password === 'function' && callback === undefined) {
                 callback = password;
                 pass = self.password;
             } else {
                 pass = password || self.password;
             }
+            iterations = self.version * 100 + 50000;
+
             self.password = pass;
+
             self.dprngFunction(
                 self.password,
-                self.seed + '$' + self.uri,
-                self.version*100,
+                self.seed.concat(self.uri),
+                iterations,
                 self.size,
                 function(key) {
                     doGeneratePassword(
@@ -87,35 +90,33 @@
 
     // Private module methods
     function dprngFunction(password, salt, rounds, size, callback) {
+        var salt_and_pepper = salt.concat('RndPhrase Improved');
         if (typeof exports === 'object') {
             var crypto = require('crypto');
 
-            crypto.pbkdf2(password, salt, rounds, size,
+            crypto.pbkdf2(password, salt_and_pepper, rounds, size,
                 function(err, key) {
                     callback(new Uint8Array(key));
                 });
         } else {
-            // Adapted from https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-            // Be warned, this assumes utf-8 input
             var str2ab = function(str) {
-                var buf = new ArrayBuffer(str.length);
-                var bufView = new Uint8Array(buf);
-                for (var i = 0; i < str.length; i += 1) {
-                    bufView[i] = str.charCodeAt(i);
+                if(TextEncoder) {
+                    return new TextEncoder().encode(str);
+                } else {
+                    throw new Error('No text-encoding module found');
                 }
-                return buf;
             };
-
-            window.crypto.subtle.importKey(
+            var cryptoObj = window.crypto || window.msCrypto; // for IE 11
+            cryptoObj.subtle.importKey(
                 'raw',
                 str2ab(password),
                 {'name': 'PBKDF2'},
                 false,
                 ['deriveBits']).then(function(key) {
-                    window.crypto.subtle.deriveBits(
+                    cryptoObj.subtle.deriveBits(
                     {
                         'name': 'PBKDF2',
-                        'salt': str2ab(salt),
+                        'salt': str2ab(salt_and_pepper),
                         iterations: rounds,
                         'hash': {'name': 'SHA-1'}
                     },
