@@ -70,7 +70,7 @@
 
             self.dprngFunction(
                 self.password,
-                self.seed + '$' + self.uri,
+                self.seed.concat(self.uri),
                 iterations,
                 self.size,
                 function(key) {
@@ -90,10 +90,11 @@
 
     // Private module methods
     function dprngFunction(password, salt, rounds, size, callback) {
+        var salt_and_pepper = salt.concat('RndPhrase Improved');
         if (typeof exports === 'object') {
             var crypto = require('crypto');
 
-            crypto.pbkdf2(password, salt, rounds, size,
+            crypto.pbkdf2(password, salt_and_pepper, rounds, size,
                 function(err, key) {
                     callback(new Uint8Array(key));
                 });
@@ -117,7 +118,7 @@
                     window.crypto.subtle.deriveBits(
                     {
                         'name': 'PBKDF2',
-                        'salt': str2ab(salt),
+                        'salt': str2ab(salt_and_pepper),
                         iterations: rounds,
                         'hash': {'name': 'SHA-1'}
                     },
